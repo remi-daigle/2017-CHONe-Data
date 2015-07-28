@@ -1,6 +1,6 @@
 =======
 
-This repository is [Software Carpentry](http://software-carpentry.org)'s
+This repository is the [Data Carpentry](http://datacarpentry.org)'s
 template for creating websites for workshops.
 
 1.  Do *not* fork this repository directly on GitHub.
@@ -11,8 +11,8 @@ template for creating websites for workshops.
     since that is what is [automatically published as a website by GitHub](https://help.github.com/articles/creating-project-pages-manually/).
 
 3.  Once you are done,
-    please **send your repository's URL to the [Software Carpentry administrator](mailto:admin@software-carpentry.org)**.
-    We build the [list of workshops on the main website](http://software-carpentry.org/workshops/index.html)
+    please **send your repository's URL to the [Data Carpentry administrator](mailto:admin@datacarpentry.org)**.
+    We build the [list of workshops on the main website](http://datacarpentry.org/workshops/index.html)
     from the data included in your `index.html` page.
     We can only do that if you [customize](CUSTOMIZATION.md) that page correctly
     *and* send us a link to your workshop website.
@@ -41,7 +41,7 @@ template for creating websites for workshops.
 
 4.  Choose a name for your workshop website repository.
     This name should have the form `YYYY-MM-DD-site`,
-    e.g., `2015-07-01-miskatonic`.
+    e.g., `2015-07-01-yale`.
 
 5.  Make sure the repository is public.
 
@@ -76,8 +76,8 @@ since [GitHub automatically publishes that as a website](https://help.github.com
 1.  Go into your newly-created repository,
     which will be at `https://github.com/your_username/YYYY-MM-DD-site`.
     For example,
-    if `your_username` is `gvwilson`,
-    the repository's URL will be `https://github.com/gvwilson/2015-07-01-mistaktonic`.
+    if `your_username` is `gracehopper`, and the site of the workshop is 'yale'
+    the repository's URL will be `https://github.com/gracehopper/2015-07-01-yale`.
 
 2.  Edit `index.html` to customize the list of instructors,
     workshop venue,
@@ -97,8 +97,8 @@ since [GitHub automatically publishes that as a website](https://help.github.com
 
     Note: the URL for your website is determined automatically
     based on the URL for your repository.
-    If your repository is at `https://github.com/gvwilson/2015-07-01-mistaktonic`,
-    its GitHub Pages website is at `http://gvwilson.github.io/2015-07-01-miskatonic`.
+    If your repository is at `https://github.com/gracehopper/2015-07-01-yale`,
+    its GitHub Pages website is at `http://gracehopper.github.io/2015-07-01-yale`.
 
 4.  When you are done editing,
     you can preview your website.

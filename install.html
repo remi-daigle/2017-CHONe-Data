@@ -1,0 +1,58 @@
+---
+layout: setup
+root: .
+assistant: []
+contact: admin@datacarpentry.org
+---
+<!--
+    Edit the values in the parameter block above to be appropriate for your bootcamp.
+    Please use three-letter month names for the 'humandate' field.
+-->
+
+<p>
+  <strong>Requirements:</strong>
+Data Carpentry's teaching is hands-on, so participants are encouraged to bring in and use their own laptops to insure the proper setup of tools for an efficient workflow once you leave the workshop.  (We will provide instructions on setting up the required software several days in advance)
+<em> There are no pre-requisites, and we will assume no prior knowledge about the tools.</em> 
+</p>
+
+
+  <strong>Contact</strong>:
+  Please email
+  {% if page.contact %}
+    <a href='mailto:{{page.contact}}'>{{page.contact}}</a>
+  {% else %}
+    <a href='mailto:{{site.contact}}'>{{site.contact}}</a>
+  {% endif %}
+  for questions and information not covered here.
+</p>
+
+
+
+
+<h2>Setup</h2>
+
+<p>
+  To participate in a Data Carpentry workshop, 
+  you will need working copies of the software described below.
+  Please make sure to install everything and try opening it to make sure it works 
+  <em>before</em> the start of your workshop. If you run into any problems,
+please feel free to email the instructor or arrive early to your workshop on 
+the first day.
+  
+Participants should bring and use their own laptops to insure the proper setup of 
+tools for an efficient workflow once you leave the workshop.
+
+<p>This workshop will be using the software outlined in the install instructions below. 
+Please see the section for your operating system for those directions.
+<ul>
+<li><a href=#windows>Windows</a>
+<li><a href=#mac>Mac</a>
+<li><a href=#linux>Linux</a>
+</ul>  
+
+</p>
+
+{% include windows.html %}
+{% include mac.html %}
+{% include linux.html %}
+

@@ -1,20 +1,19 @@
 #--------------------------------------------------------------------------------
 # Values for this workshop - EDIT THIS SECTION.
 #--------------------------------------------------------------------------------
-workshop_repo   : "http://github.com/swcarpentry/workshop-template"
-workshop_site   : "http://swcarpentry.github.io/workshop-template"
+workshop_repo   : "http://github.com/datacarpentry/workshop-template"
+workshop_site   : "http://datacarpentry.github.io/workshop-template"
 #--------------------------------------------------------------------------------
-# Standard Software Carpentry settings - should not need to be modified.
+# Standard Data Carpentry settings - should not need to be modified.
 #--------------------------------------------------------------------------------
-swc_blog        : "http://software-carpentry.org/feed.xml"
-swc_contact     : "admin@software-carpentry.org"
-swc_files       : "http://files.software-carpentry.org"
-swc_github      : "http://github.com/swcarpentry"
+dc_blog        : "http://datacarpentry.github.io/blog"
+dc_contact     : "admin@datacarpentry.org"
+dc_github      : "http://github.com/datacarpentry"
 swc_installer   : "http://files.software-carpentry.org/SWCarpentryInstaller.exe"
-swc_lessons     : "http://software-carpentry.org/v5/novice"
-swc_site        : "http://software-carpentry.org"
-swc_twitter     : "http://twitter.com/swcarpentry"
-swc_vm          : "https://docs.google.com/uc?id=0B4Kr6DYkzkQtSTZLQzF4aVB4NDQ&export=download"
+#dc_lessons     : "http://software-carpentry.org/v5/novice"
+dc_site        : "http://datacarpentry.org"
+dc_twitter     : "http://twitter.com/datacarpentry"
+#swc_vm          : "https://docs.google.com/uc?id=0B4Kr6DYkzkQtSTZLQzF4aVB4NDQ&export=download"
 #--------------------------------------------------------------------------------
 # Settings for Jekyll - should not need to be modified.
 #--------------------------------------------------------------------------------
