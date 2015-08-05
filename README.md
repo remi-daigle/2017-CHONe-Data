@@ -218,8 +218,8 @@ and add whatever content you need to it.
 We are committed to offering a pleasant setup experience for our learners and organizers.
 If you find bugs in our instructions,
 or would like to suggest improvements,
-please [file an issue](https://github.com/swcarpentry/workshop-template/issues)
+please [file an issue](https://github.com/datacarpentry/workshop-template/issues)
 or [mail us](mailto:admin@software-carpentry.org).
 
-[import]: http://import.github.com/new?import_url=https://github.com/swcarpentry/workshop-template
+[import]: http://import.github.com/new?import_url=https://github.com/datacarpentry/workshop-template
 >>>>>>> 756777d0b1930e4770be225c24c8dbd3d4e13338
