@@ -2,14 +2,14 @@
 
 *   *Where can I get help?*
 
-    Mail us at [admin@software-carpentry.org](mailto:admin@software-carpentry.org),
-    or join our [discussion list](http://lists.software-carpentry.org/mailman/listinfo/discuss_lists.software-carpentry.org)
+    Mail us at [admin@datacarpentry.org](mailto:admin@datacarpentry.org),
+    or go to our [discussion forum](http://discuss.datacarpentry.org)
     and ask for help there.
 
 *   *Where can I report problems or suggest improvements?*
 
-    Please file an issue against [https://github.com/swcarpentry/workshop-template](this repository)
-    or [mail us](mailto:admin@software-carpentry.org).
+    Please file an issue against [https://github.com/datacarpentry/workshop-template](this repository)
+    or [mail us](mailto:admin@datacarpentry.org).
 
 *   *Why does the workshop repository have to be created using `import.github.com`? Why not fork `workshop-template` on GitHub?*
 
@@ -42,7 +42,7 @@
 
 *   *What is the "Windows installer"?*
 
-    We have built a small installation helper for Windows
+    Software Carpentry has built a small installation helper for Windows
     that installs nano and SQLite, adds R to the path, and so on.
     It is maintained in
     [https://github.com/swcarpentry/windows-installer](https://github.com/swcarpentry/windows-installer),
@@ -102,8 +102,8 @@
     The error message may look something like this:
 
     ~~~
-    Configuration file: d:/OpenCourses/swc/2013-10-17-round6.4/_config.yml
-            Source: d:/OpenCourses/swc/2013-10-17-round6.4
+    Configuration file: d:/OpenCourses/dc/2013-10-17-round6.4/_config.yml
+            Source: d:/OpenCourses/dc/2013-10-17-round6.4
        Destination: _site
       Generating... c:/Ruby193/lib/ruby/gems/1.9.1/gems/posix-spawn-0.3.6/lib/posix/spawn.rb:162: wa
     rning: cannot close fd before spawn
@@ -172,7 +172,7 @@
 *   *Help, my website isn't rendering correctly once its pushed to GitHub!*
 
     This can occur if you're trying to view the website over a HTTPS connection
-    because the content from the Software Carpentry website is not currently served over HTTPS.
+    because the content from the Data Carpentry website is not currently served over HTTPS.
     Your browser sees this as unsecure content, so won't load it.
 
     To solve this,
