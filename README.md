@@ -1,6 +1,6 @@
 =======
 
-This repository is the [Data Carpentry](http://datacarpentry.org)'s
+This repository is the [Data Carpentry](http://datacarpentry.org)
 template for creating websites for workshops.
 
 1.  Do *not* fork this repository directly on GitHub.
