@@ -338,7 +338,11 @@ HANDLERS = {
     'eventbrite': (False, check_eventbrite, 'Eventbrite key appears invalid.'),
     'etherpad':   (False, check_etherpad, 'Etherpad URL appears invalid.'),
     'venue':      (False, check_pass, 'venue name not specified'),
-    'address':    (False, check_pass, 'address not specified')
+    'address':    (False, check_pass, 'address not specified'),
+    'day1_am':    (False, check_pass, 'day1_am not specified'),
+    'day1_pm':    (False, check_pass, 'day1_pm not specified'),
+    'day2_am':    (False, check_pass, 'day2_am not specified'),
+    'day2_pm':    (False, check_pass, 'day2_pm not specified')
 }
 
 # REQUIRED is all required categories.
