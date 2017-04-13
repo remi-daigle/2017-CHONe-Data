@@ -1,5 +1,5 @@
 ---
-title: "Data Management Workshop `a la CHONe"
+title: "Data Management Workshop à la CHONe"
 output:
   html_document:
     number_sections: yes
