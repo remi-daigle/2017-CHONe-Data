@@ -1,0 +1,13 @@
+---
+title: "Data Analysis and Visualization in R"
+output:
+  html_document:
+    number_sections: yes
+    toc: yes
+    toc_float: yes
+  html_notebook:
+    number_sections: yes
+    toc: yes
+    toc_float: yes
+---
+basic dplyr, tidyverse, spatial mapping with (http://remi-daigle.github.io/GIS_mapping_in_R/) (Remi/David)

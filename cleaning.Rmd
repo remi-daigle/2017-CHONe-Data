@@ -1,0 +1,13 @@
+---
+title: "Data cleaning and raw data management"
+output:
+  html_document:
+    number_sections: yes
+    toc: yes
+    toc_float: yes
+  html_notebook:
+    number_sections: yes
+    toc: yes
+    toc_float: yes
+---
+openrefine and other tools, replicable workflow (Remi/David)

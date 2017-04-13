@@ -1,0 +1,13 @@
+---
+title: "Data organization with spreadsheets"
+output:
+  html_document:
+    number_sections: yes
+    toc: yes
+    toc_float: yes
+  html_notebook:
+    number_sections: yes
+    toc: yes
+    toc_float: yes
+---
+don’t save as excel file, don’t put spaces in columns, square data frame, standard vocab for column headers, Dates. (Remi) 

@@ -21,6 +21,8 @@ Participants must bring a laptop with a Mac, Linux, or Windows operating system 
 
 - [R](http://cran.utstat.utoronto.ca/) is a language and environment for statistical computing and graphics.
 - [RStudio](https://www.rstudio.com/products/RStudio/#Desktop) (the open source 'free' version) is an integrated development environment (IDE) for R. It includes a console, syntax-highlighting editor that supports direct code execution, as well as tools for plotting, history, debugging and workspace management.
+- [Github Desktop](https://desktop.github.com/) (the app) is a seamless way to contribute to projects on [GitHub](https://github.com/) (the website)
+- [A Github account](https://github.com/join?source=header-home) Will allow you to host your version controlled project folder (repository) in the cloud for collaboration, sharing (and backup!). 
 
 ## Objectives:
 - Initiate and provide training to participants in organized reproducible data workflow
@@ -35,11 +37,11 @@ Participants must bring a laptop with a Mac, Linux, or Windows operating system 
 ## Agenda:
 | May 1 | * place and room #*  |
 |--------|-------------------------------------------------------------------------|
-|6 - 9 PM  | -Introduction to Data Workshop (why?, open access, Angela. <br> -Metadata (what is it, standards, Gis, DCT... ) Angela. <br> - Data organization with spreadsheets (don’t save as excel file, don’t put spaces in columns, square data frame, standard vocab for column headers, Dates). (Remi) <br> - Data cleaning and raw data management (openrefine and other tools, replicable workflow) (Remi/David)  |
+|6 - 9 PM  | -[Introduction to Data Workshop](https://remi-daigle.github.io/2016-05-01-CHONe-Data-Carp/introduction) (why?, open access, Angela. <br> -[Metadata]() (what is it, standards, Gis, DCT... ) Angela. <br> - [Data organization with spreadsheets]() (don’t save as excel file, don’t put spaces in columns, square data frame, standard vocab for column headers, Dates). (Remi) <br> - [Data cleaning and raw data management]() (openrefine and other tools, replicable workflow) (Remi/David)  |
  
 | May 2 | * place and room #*  |
 |--------|-------------------------------------------------------------------------|
-|8:30 AM - Noon |- Shock and awe with R (Remi/David) <br> - Text analysis  http://juliasilge.com/blog/Life-Changing-Magic/ (David/Remi) <br> - Data Analysis and Visualization in R (basic dplyr, tidyverse, spatial mapping with (http://remi-daigle.github.io/GIS_mapping_in_R/) (Remi/David)|
+|8:30 AM - Noon |- [Shock and awe with R]() (Remi/David) <br> - [Text analysis](http://juliasilge.com/blog/Life-Changing-Magic/)   (David/Remi) <br> - [Data Analysis and Visualization in R]() (basic dplyr, tidyverse, spatial mapping with (http://remi-daigle.github.io/GIS_mapping_in_R/) (Remi/David)|
 |Noon - 1 PM | - Lunch |
-| 1 - 5 | - Data Archiving & version control ( Angela: review of data repositories (zenodo, figshare, dryad, OBIS, Remi/David: version control, student builder pack, Github) |
+| 1 - 5 | - [Data Archiving & version control]() ( Angela: review of data repositories (zenodo, figshare, dryad, OBIS, Remi/David: version control, student builder pack, Github) |
 | evening | - Hacky Hour (everyone) |

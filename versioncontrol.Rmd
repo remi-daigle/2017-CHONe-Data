@@ -1,0 +1,14 @@
+---
+title: "Data Archiving & version control"
+output:
+  html_document:
+    number_sections: yes
+    toc: yes
+    toc_float: yes
+  html_notebook:
+    number_sections: yes
+    toc: yes
+    toc_float: yes
+---
+Angela: review of data repositories (zenodo, figshare, dryad, OBIS, 
+Remi/David: version control, student builder pack, Github)
