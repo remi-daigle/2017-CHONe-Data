@@ -226,9 +226,9 @@ require(marmap)
 require(raster)
 # require()</code></pre>
 <div id="plot-your-study-site" class="section level1">
-<h1><span class="header-section-number">1</span> Plot your study site</h1>
+<h1>Plot your study site</h1>
 <div id="define-site-map-limits" class="section level2">
-<h2><span class="header-section-number">1.1</span> Define site map limits</h2>
+<h2>Define site map limits</h2>
 <p>Let’s start by defining a bounding box for your study site:</p>
 <pre class="r"><code>#define the corners
 latmax &lt;- 46.25
@@ -263,10 +263,10 @@ ggplot(bb)+
 <p>Riveting!</p>
 </div>
 <div id="add-a-basemap" class="section level2">
-<h2><span class="header-section-number">1.2</span> Add a basemap!</h2>
+<h2>Add a basemap!</h2>
 <p>There are many ways to add a basemap in R</p>
 <div id="marmap-package" class="section level3">
-<h3><span class="header-section-number">1.2.1</span> marmap package</h3>
+<h3>marmap package</h3>
 <pre class="r"><code>bathymetry &lt;- getNOAA.bathy(lonmin,lonmax,latmin,latmax,resolution=1,keep=TRUE)</code></pre>
 <pre><code>## File already exists ; loading 'marmap_coord_-62.25;45.5;-61.25;46.25_res_1.csv'</code></pre>
 <pre class="r"><code>plot.bathy(bathymetry,image=T,drawlabels=TRUE)</code></pre>
@@ -314,7 +314,7 @@ ggplot() +
 </div>
 </div>
 <div id="get-data-from-obis" class="section level1">
-<h1><span class="header-section-number">2</span> Get data from OBIS</h1>
+<h1>Get data from OBIS</h1>
 <p>OBIS is the <a href="http://www.iobis.org/">Ocean Biogeographic Information System</a> and their vision is: “To be the most comprehensive gateway to the world’s ocean biodiversity and biogeographic data and information required to address pressing coastal and world ocean concerns.”</p>
 <p>We can get access to their HUGE database through the excellent <code>robis</code> package by <a href="https://ropensci.org/">ropensci</a> (unsurprisingly, they also have other great open science R packages)</p>
 <pre class="r"><code>st_as_text(bb$geometry)
