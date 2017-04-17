@@ -3,3 +3,7 @@
 .DS_Store
 _site
 .Rproj.user
+.Rhistory
+GADM_2.8_CAN_adm1.rds
+marmap_coord_*
+.Rhistory

@@ -2,12 +2,116 @@
 title: "Data organization with spreadsheets"
 output:
   html_document:
-    number_sections: yes
     toc: yes
     toc_float: yes
   html_notebook:
-    number_sections: yes
     toc: yes
     toc_float: yes
 ---
-don’t save as excel file, don’t put spaces in columns, square data frame, standard vocab for column headers, Dates. (Remi) 
+My unofficial mantra:
+
+!["Adam Savage via Pintrest"](https://s-media-cache-ak0.pinimg.com/564x/e9/f2/19/e9f219dce30f13670158832310b0e42c.jpg)
+
+
+Data is a fundamental part of 'doing science' and spreadsheets are an important, perfectly valid[^1], tool for inputing and organizing your data. 
+
+[^1]: You may have heard some people, including myself, express great frustration regarding spreadsheet programs, namely MS Excel. This is not because Excel in itself is problematic to the process of good reproducible science, but rather the problem is that it is often misused! This problem is not unique to Excel, but rather these issues crop up in all spreadsheet programs. I'll refer to Excel throughout the lesson referring to spreadsheet programs in general. More on this [here](file:///C:/Users/Remi-Work/Desktop/2016-05-01-CHONe-Data-Carp/organization.html#1_what_not_to_do_with_excel).
+
+# What not to do with Excel
+
+This title sounds negative, but I think by first showing you what not to do will help you use Excel (and other spreadsheet software) appropriatly
+
+## Be wary of dates
+
+Excel is great for data entry, but as soon as you attempt more than rudimentary statitical analyses or data vizualizations, it quickly becomes less than optimal. The options for these are rather limited and the details of how you calculated these things are hidden in cells or figure options. Worse yet, it does things to 'help' you, such as auto-formatting dates, which can be tremendously problematic if it goes unnoticed. For example, [this article](https://www.washingtonpost.com/news/wonk/wp/2016/08/26/an-alarming-number-of-scientific-papers-contain-excel-errors/?postshare=4161472211255740&tid=ss_tw) on how 1 in 5 genetics papers may have and Excel induced error. This kind of thing gives me nightmares!
+
+> **Pro-Tip**
+>
+>While there are many correct ways to input your dates into Excel, I find that the best[^2] way is to split it information over multiple columns. Either `year`, `month`, and `day`, or even better `year`, and `dayofyear` (i.e. 1 to 365). See [here](http://www.datacarpentry.org/spreadsheet-ecology-lesson/03-dates-as-data/) for more info on converting date formatting in Excel.
+
+[^2]: By 'best' I mean that it avoids the common Excel problems and doesn't cause any problems in any downstream analysis in R or other.
+
+
+
+## Keep your data tidy
+
+(**tldr: tidy data = quality of life improved**)
+
+The 'tidy' concept is something we will revisit in the R section, but the rules of tidy data are[^3]:
+
+1. Each variable you measure should be in one column
+2. Each different observation of that variable should be in a different row
+3. There should be one table for each “kind” of variable
+4. If you have multiple tables, they should include a column in the table that allows them to be linked
+
+[^3]: [Jeff Leek, The Elements of Data Analytic Style, Leanpub, 2015-03-02](https://leanpub.com/datastyle)
+
+> **Pro-Tips**
+>
+> - In practice, these rules generally translate into keeping your data 'square' (or rectangular), and not having multiple tables within one spreadsheet.
+> - `Site_ID`, or `specimen_ID` make great unique identifiers for 'linking' tables as per rule 4
+
+Following these rules makes your data more human and machine readable. In my opinion the first 2 rules (and the 4th if you have multiple tables) are totally non-negotiable. Rule 3 for me is a little fuzzy since "kind" is a little ambiguous in my mind, and doesn't mesh with what I consider 'best-practice'. My rule of thumb is that if data were collected at the same spatial and temporal scales, they will be going into 1 table. For example, conductivity (salinity), temperature, and depth of the ocean data from a CTD is often recorded at the exact same time and place since all 3 sensors are built into the same instrument. Therefore, I would keep conductivity, temperature, and depth of the ocean in 1 table since I would otherwise be repeating identical time/space data. Conversely, a sample from a plankton net will not have the same temporal resolution as a CTD therefore should be in different tables, but these instruments can sample the same site so `Site_ID` would make a great column to link between tables. 
+
+## NEVER save as .xls or .xlsx (seriously)
+
+(**tldr: re-read the title, it's the most important rule!!!**)
+
+
+In science, it is important to write everything down (see Adam above), but it is also just as important very important to be able to read what you have written! Excel by default will save your spreadsheet in it's proprietary format, which means that if you don't have Excel you can't read your file[^4]! This is also not just a rule about Excel, but rather any proprietary software. **Always save in an open format rather than a proprietary format.***
+
+[^4]: OK, I know there are other ways of opening an Excel file, but there is still an inter-operability problem. Weird, unexpexted things can often happen (e.g. again, dates!) when opening Excel files using alternative software (e.g. Open Office). Additionally, the proprietary Excel format changes over time, you may not be able to open old data files in the future.
+
+
+> **Pro-Tip**
+>
+> If you have entered your data in an Excel spreadsheet, simply click on 'Save As' and select type 'CSV (Comma delimited)'
+
+I recommend that everyone should save their data as a `.csv` (stands for comma seperated values, the name of the format gives you a clue as to how the data is formated!) instead of `.xlsx` because:
+
+1. It's easy to do
+2. You can still use Excel to enter your data
+3. It's stored as a simple text file and is nearly universally readable 
+4. It avoids common Excel pitfalls
+
+These pitfalls are an interesting point. How many times have you used:
+
+- cell color (or bold text, etc) to convey information
+- multiple tabs
+- comments (the bubble inserts)
+
+All these things are big no-no's since they will likely get scrambled, or not appear at all if you try to open in anything but Excel. Saving as `.csv` is a self reinforcing guarantee that you do not use these things since it will not save them. Multiple tabs should be multiple files, and comments (plus any other information encoded by special formatting) should be recorded in columns reserved for that use.
+
+## Don't re-invent the wheel
+######### TODO #########
+Use standard vocabuary for column headers (Angela)
+
+
+## Avoid other common headaches
+
+- Not filling in zeros
+- Using problematic null values
+- Using problematic field names
+- Using special characters in data
+
+Zeros and null values are very different computationally and statistically! A zero is when you measured a 0, so that is useful information, and a null value is when there is no data, no information (e.g. measurement was not taken or was lost). Zeros should always be recorded `0` while null values are a bit trickier; either leaving the cell blank or inserting an `NA` are usually the least problematic options.
+
+Many of the statistical software options are very fussy about spaces, periods, and slashes in field names (column headers). Underscores (`_`) are a good alternative to spaces. Consider writing names in camel case (like this: ExampleFileName) to improve
+readability. Remember that abbreviations that make sense at the moment may not be so obvious in 6 months, but don't overdo it with names that are excessively long. Including the units in the field names avoids confusion and enables others to readily interpret your fields.
+
+**Examples**  
+
+| Good Name        | Good Alternative  | Avoid             |
+|------------------|-------------------|-------------------|
+| Max_temp_C       | MaxTemp           | Maximum Temp (°C) |
+| Precipitation_mm | Precipitation     | precmm            |
+| Mean_year_growth | MeanYearGrowth    | Mean growth/year  |
+| sex              | sex               | M/F               |
+| weight           | weight            | w.                |
+| cell_type        | CellType          | Cell Type         |
+| Observation_01   | first_observation | 1st Obs           |
+
+# Important links
+This section has been a shortened version of the Data Carpentry material on [spreadsheet organization](http://www.datacarpentry.org/spreadsheet-ecology-lesson/)
+
+There is a twitter hashtag called [#otherpeoplesdata](https://twitter.com/hashtag/otherpeoplesdata?lang=en) for people venting about problems while using other people's data, hopefully this workshop will allow you to avoid that hashtag!
