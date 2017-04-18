@@ -13,21 +13,21 @@ My unofficial mantra:
 !["Adam Savage via Pintrest"](https://s-media-cache-ak0.pinimg.com/564x/e9/f2/19/e9f219dce30f13670158832310b0e42c.jpg)
 
 
-Data is a fundamental part of 'doing science' and spreadsheets are an important, perfectly valid[^1], tool for inputing and organizing your data. 
+Data is a fundamental part of 'doing science' and spreadsheets are an important, perfectly valid[^1], tool for inputting and organizing your data. 
 
 [^1]: You may have heard some people, including myself, express great frustration regarding spreadsheet programs, namely MS Excel. This is not because Excel in itself is problematic to the process of good reproducible science, but rather the problem is that it is often misused! This problem is not unique to Excel, but rather these issues crop up in all spreadsheet programs. I'll refer to Excel throughout the lesson referring to spreadsheet programs in general. More on this [here](file:///C:/Users/Remi-Work/Desktop/2016-05-01-CHONe-Data-Carp/organization.html#1_what_not_to_do_with_excel).
 
 # What not to do with Excel
 
-This title sounds negative, but I think by first showing you what not to do will help you use Excel (and other spreadsheet software) appropriatly
+This title sounds negative, but I think by first showing you what not to do will help you use Excel (and other spreadsheet software) appropriately
 
 ## Be wary of dates
 
-Excel is great for data entry, but as soon as you attempt more than rudimentary statitical analyses or data vizualizations, it quickly becomes less than optimal. The options for these are rather limited and the details of how you calculated these things are hidden in cells or figure options. Worse yet, it does things to 'help' you, such as auto-formatting dates, which can be tremendously problematic if it goes unnoticed. For example, [this article](https://www.washingtonpost.com/news/wonk/wp/2016/08/26/an-alarming-number-of-scientific-papers-contain-excel-errors/?postshare=4161472211255740&tid=ss_tw) on how 1 in 5 genetics papers may have and Excel induced error. This kind of thing gives me nightmares!
+Excel is great for data entry, but as soon as you attempt more than rudimentary statistical analyses or data visualizations, it quickly becomes less than optimal. The options for these are rather limited and the details of how you calculated these things are hidden in cells or figure options. Worse yet, it does things to 'help' you, such as auto-formatting dates, which can be tremendously problematic if it goes unnoticed. For example, [this article](https://www.washingtonpost.com/news/wonk/wp/2016/08/26/an-alarming-number-of-scientific-papers-contain-excel-errors/?postshare=4161472211255740&tid=ss_tw) on how 1 in 5 genetics papers may have and Excel induced error. This kind of thing gives me nightmares!
 
 > **Pro-Tip**
 >
->While there are many correct ways to input your dates into Excel, I find that the best[^2] way is to split it information over multiple columns. Either `year`, `month`, and `day`, or even better `year`, and `dayofyear` (i.e. 1 to 365). See [here](http://www.datacarpentry.org/spreadsheet-ecology-lesson/03-dates-as-data/) for more info on converting date formatting in Excel.
+>While there are many correct ways to input your dates into Excel, I find that the best[^2] way is to split it information over multiple columns. Either `year`, `month`, and `day`, or even better `year`, and `DayOfYear` (i.e. 1 to 365). See [here](http://www.datacarpentry.org/spreadsheet-ecology-lesson/03-dates-as-data/) for more info on converting date formatting in Excel.
 
 [^2]: By 'best' I mean that it avoids the common Excel problems and doesn't cause any problems in any downstream analysis in R or other.
 
@@ -49,9 +49,9 @@ The 'tidy' concept is something we will revisit in the R section, but the rules 
 > **Pro-Tips**
 >
 > - In practice, these rules generally translate into keeping your data 'square' (or rectangular), and not having multiple tables within one spreadsheet.
-> - `Site_ID`, or `specimen_ID` make great unique identifiers for 'linking' tables as per rule 4
+> - `locationID`, or `organismID` make great unique identifiers for 'linking' tables as per rule 4
 
-Following these rules makes your data more human and machine readable. In my opinion the first 2 rules (and the 4th if you have multiple tables) are totally non-negotiable. Rule 3 for me is a little fuzzy since "kind" is a little ambiguous in my mind, and doesn't mesh with what I consider 'best-practice'. My rule of thumb is that if data were collected at the same spatial and temporal scales, they will be going into 1 table. For example, conductivity (salinity), temperature, and depth of the ocean data from a CTD is often recorded at the exact same time and place since all 3 sensors are built into the same instrument. Therefore, I would keep conductivity, temperature, and depth of the ocean in 1 table since I would otherwise be repeating identical time/space data. Conversely, a sample from a plankton net will not have the same temporal resolution as a CTD therefore should be in different tables, but these instruments can sample the same site so `Site_ID` would make a great column to link between tables. 
+Following these rules makes your data more human and machine readable. In my opinion the first 2 rules (and the 4th if you have multiple tables) are totally non-negotiable. Rule 3 for me is a little fuzzy since "kind" is a little ambiguous in my mind, and doesn't mesh with what I consider 'best-practice'. My rule of thumb is that if data were collected at the same spatial and temporal scales, they will be going into 1 table. For example, conductivity (salinity), temperature, and depth of the ocean data from a CTD is often recorded at the exact same time and place since all 3 sensors are built into the same instrument. Therefore, I would keep conductivity, temperature, and depth of the ocean in 1 table since I would otherwise be repeating identical time/space data. Conversely, a sample from a plankton net will not have the same temporal resolution as a CTD therefore should be in different tables, but these instruments can sample the same site so `locationID` would make a great column to link between tables. 
 
 ## NEVER save as .xls or .xlsx (seriously)
 
@@ -60,14 +60,14 @@ Following these rules makes your data more human and machine readable. In my opi
 
 In science, it is important to write everything down (see Adam above), but it is also just as important very important to be able to read what you have written! Excel by default will save your spreadsheet in it's proprietary format, which means that if you don't have Excel you can't read your file[^4]! This is also not just a rule about Excel, but rather any proprietary software. **Always save in an open format rather than a proprietary format.***
 
-[^4]: OK, I know there are other ways of opening an Excel file, but there is still an inter-operability problem. Weird, unexpexted things can often happen (e.g. again, dates!) when opening Excel files using alternative software (e.g. Open Office). Additionally, the proprietary Excel format changes over time, you may not be able to open old data files in the future.
+[^4]: OK, I know there are other ways of opening an Excel file, but there is still an interoperability problem. Weird, unexpected things can often happen (e.g. again, dates!) when opening Excel files using alternative software (e.g. Open Office). Additionally, the proprietary Excel format changes over time, you may not be able to open old data files in the future.
 
 
 > **Pro-Tip**
 >
 > If you have entered your data in an Excel spreadsheet, simply click on 'Save As' and select type 'CSV (Comma delimited)'
 
-I recommend that everyone should save their data as a `.csv` (stands for comma seperated values, the name of the format gives you a clue as to how the data is formated!) instead of `.xlsx` because:
+I recommend that everyone should save their data as a `.csv` (stands for comma separated values, the name of the format gives you a clue as to how the data is formatted!) instead of `.xlsx` because:
 
 1. It's easy to do
 2. You can still use Excel to enter your data
@@ -83,8 +83,79 @@ These pitfalls are an interesting point. How many times have you used:
 All these things are big no-no's since they will likely get scrambled, or not appear at all if you try to open in anything but Excel. Saving as `.csv` is a self reinforcing guarantee that you do not use these things since it will not save them. Multiple tabs should be multiple files, and comments (plus any other information encoded by special formatting) should be recorded in columns reserved for that use.
 
 ## Don't re-invent the wheel
-######### TODO #########
-Use standard vocabuary for column headers (Angela)
+For column headers CHONe recommends you use the [Darwin Core Terms](http://rs.tdwg.org/dwc/terms/)
+It contains helpful information about how to use standard column headers. It will help others (and yourself a few months after writing your data) understand your data. It also will streamline the process when you submit your data to be archived with [OBIS](http://www.iobis.org/).
+
+Some common ones you will all likely use are for date/time: `year`, `month`, `day`, `eventTime`, `eventDate`, or for location: `locationID`, `decimalLongitude` and `decimalLatitude`. 
+
+For latitude and longitude, it's better to write: `-41.0983423` and `-121.1761111`  and NOT: 47° 33' 37.9404'' N and 52° 42' 46.1880'' W because the decimal version will be easier for the computer to read and it is 'according to standard'!
+ 
+For`eventdate` here are a few examples: 
+- `1963-03-08T14:07-0600` is 8 Mar 1963 2:07pm in the time zone six hours earlier than UTC
+- `2009-02-20T08:40Z` is 20 Feb 2009 8:40am UTC
+- `1809-02-12` is 12 Feb 1809
+- `1906-06` is Jun 1906
+- `1971` is just that year
+- `2007-03-01T13:00:00Z/2008-05-11T15:30:00Z` is the interval between 1 Mar 2007 1pm UTC and 11 May 2008 3:30pm UTC
+- `2007-11-13/15` is the interval between 13 Nov 2007 and 15 Nov 2007.
+ 
+But I am personally uneasy about typing all of that into Excel, it may try to reinterpret what you wrote while trying to 'help' you. I would recommend keeping that information separated into the `year`, `month`, `day`, and `eventTime` columns
+
+- `year` : 2008
+- `month` : 1 (not "January")
+- `day`: 28
+- `eventTime`: "14:07-0600" is 2:07pm in the time zone six hours earlier than UTC
+- `eventTime`: "08:40:21Z" is 8:40:21am UTC
+- `eventTime`: "13:00:00Z/15:30:00Z" is the interval between 1pm UTC and 3:30pm UTC.
+
+That way you are still following the standard, yet keeping Excel's eccentricities at bay and as a bonus, I think it's easier to work with the pre-separated variables in R. You can also generate an `evenDate` column in R by pasting all the rows together
+
+```{r,message=FALSE}
+require(tidyverse)
+data <- data.frame(
+    year = c(2008,2003,2009),
+    month = c(1,2,3),
+    day = c(28,12,12),
+    eventTime = c("12:00-0600","01:15-0600","14:07-0600")
+)
+
+# you may notice that my year, month, and day columns are numeric and won't have the require leading 0's
+# we can fix that with sprintf:
+sprintf("%02d",data$month)
+
+# here's a 'one-liner' that will add leading zeros, paste all the columns together, and seperate them by the required '-'
+
+data <- data %>% 
+    mutate(eventDate=paste(sprintf("%04d",year),
+                           sprintf("%02d",month),
+                           sprintf("%02d",day),
+                           eventTime,
+                           sep="-")
+           )
+
+data
+```
+
+Or alternatively, if you're like me and want to keep the time numeric for ease of programming, consider this (but be sure to recreate an `eventTime` that includes time zone information):
+
+```{r}
+data <- data.frame(
+    year = c(2008,2003,2009),
+    month = c(1,2,3),
+    day = c(28,12,12),
+    hour = c(12,1,14),
+    minute = c(0,15,7)
+)
+
+data <- data %>% 
+    mutate(eventTime=paste0(sprintf("%02d",hour),
+                            ":",
+                            sprintf("%02d",minute),
+                            "-0600")
+           )
+
+data
+```
 
 
 ## Avoid other common headaches
@@ -97,7 +168,7 @@ Use standard vocabuary for column headers (Angela)
 Zeros and null values are very different computationally and statistically! A zero is when you measured a 0, so that is useful information, and a null value is when there is no data, no information (e.g. measurement was not taken or was lost). Zeros should always be recorded `0` while null values are a bit trickier; either leaving the cell blank or inserting an `NA` are usually the least problematic options.
 
 Many of the statistical software options are very fussy about spaces, periods, and slashes in field names (column headers). Underscores (`_`) are a good alternative to spaces. Consider writing names in camel case (like this: ExampleFileName) to improve
-readability. Remember that abbreviations that make sense at the moment may not be so obvious in 6 months, but don't overdo it with names that are excessively long. Including the units in the field names avoids confusion and enables others to readily interpret your fields.
+readability. Remember that abbreviations that make sense at the moment may not be so obvious in 6 months, but don't overdo it with names that are excessively long. Including the units in the field names avoids confusion and enables others to readily interpret your fields. Also, as always, check the standard ([Darwin Core Terms](http://rs.tdwg.org/dwc/terms/)) in case you should be using something specific, these are just general instructions for when yo need to make a new column name.
 
 **Examples**  
 
