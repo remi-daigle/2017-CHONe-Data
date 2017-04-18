@@ -33,11 +33,11 @@ Participants must bring a laptop with a Mac, Linux, or Windows operating system 
 - Angela Grant
 
 ## Agenda:
-| May 1 | * place and room #*  |
+| May 1 | *Four Points Gatineau, Renaissance B, 4th Floor*  |
 |--------|-------------------------------------------------------------------------|
 |6 - 9 PM  | - [Introduction to Data Workshop](https://remi-daigle.github.io/2016-05-01-CHONe-Data-Carp/introduction) (why?, open access, Angela. <br> - [Metadata](https://remi-daigle.github.io/2016-05-01-CHONe-Data-Carp/metadata) (what is it, standards, Gis, DCT... ) Angela. <br> - [Data organization with spreadsheets](https://remi-daigle.github.io/2016-05-01-CHONe-Data-Carp/organization) (don’t save as excel file, don’t put spaces in columns, square data frame, standard vocab for column headers, Dates). (Remi) <br> - [Data cleaning and raw data management](https://remi-daigle.github.io/2016-05-01-CHONe-Data-Carp/cleaning) (openrefine and other tools, replicable workflow) (Remi/David)  |
  
-| May 2 | * place and room #*  |
+| May 2 | *Four Points Gatineau, Renaissance B, 4th Floor*  |
 |--------|-------------------------------------------------------------------------|
 |8:30 AM - Noon | - [Shock and awe with R](https://remi-daigle.github.io/2016-05-01-CHONe-Data-Carp/shocknawe) (Remi/David) <br> - [Text analysis](https://remi-daigle.github.io/2016-05-01-CHONe-Data-Carp/text)   (David/Remi) <br> - [Data Analysis and Visualization in R](https://remi-daigle.github.io/2016-05-01-CHONe-Data-Carp/dataviz) (basic dplyr, tidyverse, spatial mapping with (http://remi-daigle.github.io/GIS_mapping_in_R/) (Remi/David)|
 |Noon - 1 PM | - Lunch |
