@@ -277,6 +277,15 @@ div.tocify {
 <li>comments (the bubble inserts)</li>
 </ul>
 <p>All these things are big no-no’s since they will likely get scrambled, or not appear at all if you try to open in anything but Excel. Saving as <code>.csv</code> is a self reinforcing guarantee that you do not use these things since it will not save them. Multiple tabs should be multiple files, and comments (plus any other information encoded by special formatting) should be recorded in columns reserved for that use.</p>
+<blockquote>
+<p><strong>EXERCISE</strong></p>
+<ul>
+<li>Open new spreadsheet in Excel, write a few rows of data into your spreadsheet and save your file as both a <code>.csv</code> and a <code>.xlsx</code>.</li>
+<li>Close Excel</li>
+<li>Open both files using Excel</li>
+<li>Open both files using a basic text editor (e.g. Notepad on Windows, or TextEdit on Mac) Do the files look identical in Excel? In the text editor? Which format seems better to you and why?</li>
+</ul>
+</blockquote>
 </div>
 <div id="dont-re-invent-the-wheel" class="section level2">
 <h2>Don’t re-invent the wheel</h2>
@@ -293,7 +302,7 @@ div.tocify {
 <li><code>eventTime</code>: “08:40:21Z” is 8:40:21am UTC</li>
 <li><code>eventTime</code>: “13:00:00Z/15:30:00Z” is the interval between 1pm UTC and 3:30pm UTC.</li>
 </ul>
-<p>That way you are still following the standard, yet keeping Excel’s eccentricities at bay and as a bonus, I think it’s easier to work with the pre-separated variables in R. You can also generate an <code>evenDate</code> column in R by pasting all the rows together</p>
+<p>That way you are still following the standard, yet keeping Excel’s eccentricities at bay and as a bonus, I think it’s easier to work with the pre-separated variables in R. You can also generate an <code>evenDate</code> column in R by pasting all the rows together. (If the code below seems like gibberish, that’s totally OK, we will explain all the steps when we get into R in the later lessons, just remember this code is here!)</p>
 <pre class="r"><code>require(tidyverse)</code></pre>
 <pre class="r"><code>data &lt;- data.frame(
     year = c(2008,2003,2009),

@@ -84,6 +84,14 @@ These pitfalls are an interesting point. How many times have you used:
 
 All these things are big no-no's since they will likely get scrambled, or not appear at all if you try to open in anything but Excel. Saving as `.csv` is a self reinforcing guarantee that you do not use these things since it will not save them. Multiple tabs should be multiple files, and comments (plus any other information encoded by special formatting) should be recorded in columns reserved for that use.
 
+>**EXERCISE**
+>
+> - Open new spreadsheet in Excel, write a few rows of data into your spreadsheet and save your file as both a `.csv` and a `.xlsx`.
+- Close Excel
+- Open both files using Excel
+- Open both files using a basic text editor (e.g. Notepad on Windows, or TextEdit on Mac)
+Do the files look identical in Excel? In the text editor? Which format seems better to you and why?
+
 ## Don't re-invent the wheel
 For column headers CHONe recommends you use the [Darwin Core Terms](http://rs.tdwg.org/dwc/terms/)
 It contains helpful information about how to use standard column headers. It will help others (and yourself a few months after writing your data) understand your data. It also will streamline the process when you submit your data to be archived with [OBIS](http://www.iobis.org/).
@@ -110,7 +118,7 @@ But I am personally uneasy about typing all of that into Excel, it may try to re
 - `eventTime`: "08:40:21Z" is 8:40:21am UTC
 - `eventTime`: "13:00:00Z/15:30:00Z" is the interval between 1pm UTC and 3:30pm UTC.
 
-That way you are still following the standard, yet keeping Excel's eccentricities at bay and as a bonus, I think it's easier to work with the pre-separated variables in R. You can also generate an `evenDate` column in R by pasting all the rows together
+That way you are still following the standard, yet keeping Excel's eccentricities at bay and as a bonus, I think it's easier to work with the pre-separated variables in R. You can also generate an `evenDate` column in R by pasting all the rows together. (If the code below seems like gibberish, that's totally OK, we will explain all the steps when we get into R in the later lessons, just remember this code is here!)
 
 ```{r,message=FALSE}
 require(tidyverse)
