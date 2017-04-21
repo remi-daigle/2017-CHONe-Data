@@ -9,7 +9,25 @@ output:
     toc_float: yes
 ---
 [<<BACK](https://remi-daigle.github.io/2017-CHONe-Data/)
+(Remi/David)
 
-basic dplyr, tidyverse, spatial mapping with (http://remi-daigle.github.io/GIS_mapping_in_R/) (Remi/David)
+# The `tidyverse` 'meta' package
+
+## The `dplyr` package
+
+## The `tidyr` package
+
+## The `ggplot2` package
+
+# Mapping
+
+## The classic and the cutting edge: `sp` vs `sf`
+
+### The `sp` package
+
+### The `sf` package
+
+# Important links
+A [GIS tutorial](http://remi-daigle.github.io/GIS_mapping_in_R/) written by Remi (mostly in `sp`)
 
 [<<BACK](https://remi-daigle.github.io/2017-CHONe-Data/)
