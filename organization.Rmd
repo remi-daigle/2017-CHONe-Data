@@ -15,7 +15,7 @@ My unofficial mantra:
 
 Data is a fundamental part of 'doing science' and spreadsheets are an important, perfectly valid[^1], tool for inputting and organizing your data. 
 
-[^1]: You may have heard some people, including myself, express great frustration regarding spreadsheet programs, namely MS Excel. This is not because Excel in itself is problematic to the process of good reproducible science, but rather the problem is that it is often misused! This problem is not unique to Excel, but rather these issues crop up in all spreadsheet programs. I'll refer to Excel throughout the lesson referring to spreadsheet programs in general. More on this [here](file:///C:/Users/Remi-Work/Desktop/2016-05-01-CHONe-Data-Carp/organization.html#1_what_not_to_do_with_excel).
+[^1]: You may have heard some people, including myself, express great frustration regarding spreadsheet programs, namely MS Excel. This is not because Excel in itself is problematic to the process of good reproducible science, but rather the problem is that it is often misused! This problem is not unique to Excel, but rather these issues crop up in all spreadsheet programs. I'll refer to Excel throughout the lesson referring to spreadsheet programs in general. More on this [here](file:///C:/Users/Remi-Work/Desktop/2017-CHONe-Data/organization.html#1_what_not_to_do_with_excel).
 
 # What not to do with Excel
 
