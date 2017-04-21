@@ -8,6 +8,8 @@ output:
     toc: yes
     toc_float: yes
 ---
+[<<BACK](https://remi-daigle.github.io/2017-CHONe-Data/)
+
 My unofficial mantra:
 
 !["Adam Savage via Pintrest"](https://s-media-cache-ak0.pinimg.com/564x/e9/f2/19/e9f219dce30f13670158832310b0e42c.jpg)
@@ -188,3 +190,5 @@ readability. Remember that abbreviations that make sense at the moment may not b
 This section has been a shortened version of the Data Carpentry material on [spreadsheet organization](http://www.datacarpentry.org/spreadsheet-ecology-lesson/)
 
 There is a twitter hashtag called [#otherpeoplesdata](https://twitter.com/hashtag/otherpeoplesdata?lang=en) for people venting about problems while using other people's data, hopefully this workshop will allow you to avoid that hashtag!
+
+[<<BACK](https://remi-daigle.github.io/2017-CHONe-Data/)

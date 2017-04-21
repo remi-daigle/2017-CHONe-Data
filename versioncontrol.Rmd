@@ -8,5 +8,9 @@ output:
     toc: yes
     toc_float: yes
 ---
+[<<BACK](https://remi-daigle.github.io/2017-CHONe-Data/)
+
 Angela: review of data repositories (zenodo, figshare, dryad, OBIS, 
 Remi/David: version control, student builder pack, Github)
+
+[<<BACK](https://remi-daigle.github.io/2017-CHONe-Data/)

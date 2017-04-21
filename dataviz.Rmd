@@ -8,4 +8,8 @@ output:
     toc: yes
     toc_float: yes
 ---
+[<<BACK](https://remi-daigle.github.io/2017-CHONe-Data/)
+
 basic dplyr, tidyverse, spatial mapping with (http://remi-daigle.github.io/GIS_mapping_in_R/) (Remi/David)
+
+[<<BACK](https://remi-daigle.github.io/2017-CHONe-Data/)

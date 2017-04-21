@@ -8,4 +8,8 @@ output:
     toc: yes
     toc_float: yes
 ---
+[<<BACK](https://remi-daigle.github.io/2017-CHONe-Data/)
+
 http://juliasilge.com/blog/Life-Changing-Magic/
+
+[<<BACK](https://remi-daigle.github.io/2017-CHONe-Data/)
