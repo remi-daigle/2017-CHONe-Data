@@ -112,6 +112,8 @@ That way you are still following the standard, yet keeping Excel's eccentricitie
 
 ```{r,message=FALSE}
 require(tidyverse)
+```
+```{r}
 data <- data.frame(
     year = c(2008,2003,2009),
     month = c(1,2,3),

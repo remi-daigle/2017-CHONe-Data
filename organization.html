@@ -293,8 +293,8 @@ div.tocify {
 <li><code>eventTime</code>: “13:00:00Z/15:30:00Z” is the interval between 1pm UTC and 3:30pm UTC.</li>
 </ul>
 <p>That way you are still following the standard, yet keeping Excel’s eccentricities at bay and as a bonus, I think it’s easier to work with the pre-separated variables in R. You can also generate an <code>evenDate</code> column in R by pasting all the rows together</p>
-<pre class="r"><code>require(tidyverse)
-data &lt;- data.frame(
+<pre class="r"><code>require(tidyverse)</code></pre>
+<pre class="r"><code>data &lt;- data.frame(
     year = c(2008,2003,2009),
     month = c(1,2,3),
     day = c(28,12,12),
