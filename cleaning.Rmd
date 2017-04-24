@@ -340,6 +340,10 @@ larvalAbundance <- read.csv("rawdata/larval abundance.csv", stringsAsFactors = F
 
 ```
 
+This data comes from one of Remi's PhD thesis chapters[^1] that was part of the first CHONe. I modified it from the original version archived on [Dryad](http://datadryad.org/handle/10255/dryad.59482) so we would have cleaning to do!
+
+[^1]: Daigle RM, Metaxas A, deYoung B (2014) Bay-scale patterns in the distribution, aggregation and spatial variability of larvae of benthic invertebrates. Marine Ecology Progress Series 503:139-156. http://dx.doi.org/10.3354/meps10734
+
 ## Cleaning data in R
 
 Common errors in data are:
@@ -418,9 +422,15 @@ Now we have a choice, we can either run a data cleaning script every time we loa
 dir.create("data")
 
 # Then let's save the cleaned data in that folder
-write.csv(larvalAbundance, file = "data/cleandata.csv", row.names = FALSE)
+write.csv(larvalAbundance, file = "data/larvalAbundanceClean.csv", row.names = FALSE)
 ```
 
+>**Pro-tip**
+>
+> Notice that:
+> - we are not writing over the raw data
+> - we are not writing in the same folder as the raw data
+> - we are naming our new data file informatively
 
 ## Making your own functions and packages
 
