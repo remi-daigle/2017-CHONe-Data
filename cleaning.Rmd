@@ -73,11 +73,11 @@ You are now working on a copy of the raw data and changes you make in OpenRefine
 
 ## Reproducibility
 
-OpenRefine saves every change, every edit you make to the dataset in a file you can save on your machine. If you had 20 files to clean, and they all had the same type of errors, and all files had the same columns, you could save the script, open a new file to clean, paste in the script and run it. Voila, clean data.
+OpenRefine saves every change, every edit you make to the larvalAbundance in a file you can save on your machine. If you had 20 files to clean, and they all had the same type of errors, and all files had the same columns, you could save the script, open a new file to clean, paste in the script and run it. Voila, clean data.
 
 - In the `Undo / Redo section`, click `Extract`, save the bits desired using the check boxes.
 - Copy the code and paste it into a text editor. Save it as a `.txt` file.
-- To run these steps on a new dataset, import the new dataset into OpenRefine, open the `Extract / Apply` section, paste in the `.txt` file, click `Apply`.
+- To run these steps on a new larvalAbundance, import the new larvalAbundance into OpenRefine, open the `Extract / Apply` section, paste in the `.txt` file, click `Apply`.
 
 For more information and tutorials on OpenRefine, please see [Data Carpentry](http://www.datacarpentry.org/OpenRefine-ecology-lesson/)
 
@@ -328,13 +328,13 @@ Go back to the project folder you extracted and open the `2017-CHONe-Data.Rproj`
 # you can hard code the whole file path, but try to never do that!
 # your computer may not have a C drive, and your name almost certainly is not Remi, so this will not work for you
 
-# dataset <- read.csv("C:/Users/Remi-Work/Desktop/2017-CHONe-Data/rawdata/larval abundance.csv")
+# larvalAbundance <- read.csv("C:/Users/Remi-Work/Desktop/2017-CHONe-Data/rawdata/larval abundance.csv")
 
 # The above is unsurprisingly not reproducible! Always use relative paths!
 # Relative paths are a shortened version of the above, you only need to type what comes after the project directory
 # REMINDER: The project directory is where the .Rproj file is stored
 
-dataset <- read.csv("rawdata/larval abundance.csv", stringsAsFactors = FALSE)
+larvalAbundance <- read.csv("rawdata/larval abundance.csv", stringsAsFactors = FALSE)
 
 # writing it this way (relative path) means that your project is reproducible since you can move this whole directory to another location on your computer OR ANY OTHER COMPUTER!!!
 
@@ -351,39 +351,39 @@ Common errors in data are:
 
 The first step I always take is to make sure that the data loaded in as expected. Head over to the Environment window and click on `data`. You can do (temporary) sorting and filtering of the data in the data viewer. I also use the `str()` function to make sure all the variables (columns) are of the correct type.
 ```{r}
-str(dataset)
+str(larvalAbundance)
 ```
 
 If I wanted to make a correction manually, we can use indexing:
 ```{r}
 # say for example, I knew that the second observation was in fact taken at 12 m depth
-dataset$depth[2]
+larvalAbundance$depth[2]
 
 # the value in the data frame is indeed 3 WRONG! Let,s correct it 
-dataset$depth[2] <- 12
-head(dataset)
+larvalAbundance$depth[2] <- 12
+head(larvalAbundance)
 
 # The other issue you may notice is that my months values are mostly numbers, but there's at least 1 "August" in there
 # We could correct just that one we see on line 4
-dataset$month[4] <- 8
+larvalAbundance$month[4] <- 8
 
 # Or we could get rid of all the "August"'s in one pass
-dataset$month[dataset$month=="August"] <- 8
+larvalAbundance$month[larvalAbundance$month=="August"] <- 8
 
 # but that column is still a character string, let's convert it to numeric
-dataset$month <- as.numeric(dataset$month)
+larvalAbundance$month <- as.numeric(larvalAbundance$month)
 
-str(dataset)
+str(larvalAbundance)
 
 ```
 
 
 If you were wondering how many years I had sampled, you could do:
 ```{r}
-unique(dataset$year)
+unique(larvalAbundance$year)
 
 # or for time
-unique(dataset$time)
+unique(larvalAbundance$time)
 
 # as you can see there are a few trailing white spaces, to do text substitutions, let's use gsub()
 # but first let's see how this works; it matches a pattern in x and replaces it.
@@ -394,7 +394,7 @@ gsub(pattern = "doesn't work",replacement = "works",x = "If this sentence no lon
 
 # So now, let's use gsub to remove those spaces. The patter we are matching is just a space and the replacement is nothing, so that will remove white spaces
 
-dataset$time <- gsub(pattern = " ",replacement = "",x = dataset$time)
+larvalAbundance$time <- gsub(pattern = " ",replacement = "",x = larvalAbundance$time)
 
 ```
 
@@ -403,9 +403,9 @@ Feel the power! The `gsub()` function is very powerful and the pattern matching 
 Other useful things you should check are the minimum and maximum values for each column to make sure things were entered all in the same order of magnitude, or a even a quick histogram
 
 ```{r}
-min(dataset$Margarites.spp.)
-max(dataset$Margarites.spp.)
-hist(dataset$Margarites.spp.)
+min(larvalAbundance$Margarites.spp.)
+max(larvalAbundance$Margarites.spp.)
+hist(larvalAbundance$Margarites.spp.)
 
 ```
 
@@ -418,7 +418,7 @@ Now we have a choice, we can either run a data cleaning script every time we loa
 dir.create("data")
 
 # Then let's save the cleaned data in that folder
-write.csv(dataset, file = "data/cleandata.csv", row.names = FALSE)
+write.csv(larvalAbundance, file = "data/cleandata.csv", row.names = FALSE)
 ```
 
 
