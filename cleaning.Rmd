@@ -413,6 +413,18 @@ hist(larvalAbundance$Margarites.spp.)
 
 ```
 
+Lastly, there are some column names that are not 'up to code', so to avoid a stern talking to from CHONe's data manager, let's fix that now!
+
+```{r}
+names(larvalAbundance)
+
+names(larvalAbundance)[names(larvalAbundance)=="long"] <- "decimalLongitude"
+names(larvalAbundance)[names(larvalAbundance)=="lat"] <- "decimalLatitude"
+names(larvalAbundance)[names(larvalAbundance)=="site"] <- "locationID"
+
+```
+
+
 Everything now seems reasonable to me, but it is your responsibility to check that each column of your data 'makes sense'. But for sake of time, lets move on!
 
 Now we have a choice, we can either run a data cleaning script every time we load the raw data, or we can save a 'clean' data product. Let's do the latter.
