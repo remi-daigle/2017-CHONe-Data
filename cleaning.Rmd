@@ -35,7 +35,7 @@ I advise you archive your data immediately upon collection to reduce risk of dat
 
 ![[](https://twitter.com/TrevorABranch/status/466780827985002496)](pictures/Branch.png)
 
-By now I've probably said the words reproducible and reproducibility so often that it's starting to lose meaning. Trust me, this is important! (or don't trust me and read ["A manifesto for reproducible Science"](https://www.nature.com/articles/s41562-016-0021)). By not 'hiding' you workflow, you help:
+By now I've probably said the words reproducible and reproducibility so often that it's starting to lose meaning. Trust me, this is important! (or don't trust me and read ["A manifesto for reproducible Science"](https://www.nature.com/articles/s41562-016-0021), and ["Reproducible Data Science with R"](https://www.r-bloggers.com/reproducible-data-science-with-r/)). By not 'hiding' you workflow, you help:
 
 - **yourself** in the future since:
     - you can easily re-run your analysis after 'reviewer 3' makes you add one data point
@@ -110,7 +110,7 @@ There's also a lot more information about RStudio on their [cheatsheet](https://
 ## Enough talk! Let's get coding! The Fundamentals
 You read my mind! However, before we get to cleaning the data, we need to cover a few R fundamentals so that what we do in later steps makes sense.
 
-Go back to the project folder you downloaded during the [OpenRefine lesson](file:///C:/Users/Remi-Work/Desktop/2016-05-01-CHONe-Data-Carp/cleaning.html#openrefine) and open the `2017-CHONe-Data.Rproj` file. This is an R project file that allows you to set a number of options for the project (see [here](https://support.rstudio.com/hc/en-us/articles/200526207-Using-Projects)), but for our purposes just know that the project file is setting the 'working directory', it tells R where all your files are. We'll get back to that later.
+Go back to the project folder you downloaded during the [OpenRefine lesson](https://remi-daigle.github.io/2017-CHONe-Data/cleaning.html#openrefine) and open the `2017-CHONe-Data.Rproj` file. This is an R project file that allows you to set a number of options for the project (see [here](https://support.rstudio.com/hc/en-us/articles/200526207-Using-Projects)), but for our purposes just know that the project file is setting the 'working directory', it tells R where all your files are. We'll get back to that later.
 
 In R you can do math, type the command below in your R console and hit enter:
 ```{r}
@@ -138,7 +138,7 @@ Up to now, we've been dealing with numbers, but R can also deal with character s
 f <- "This is a character string, you can tell because of the quotation marks"
 ```
 
-A object can also contain multiple values. The `:` symbol essentially means 'to'
+A object can also contain multiple values, this is called a vector. The `:` symbol essentially means 'to'
 
 ```{r}
 x <- 1:3
@@ -187,7 +187,7 @@ To create a new script, your can click on the little paper with the plus symbol 
 
 ![](pictures/newscript.png)
 
-These scripts are designed to read by R from top to bottom when you hit the ![](pictures/source.png) button, or `Ctrl`+`Shift`+`S` (Windows), or `Command`+`Shift`+`S` (Mac). Alternatively, you can run portions of your code with `Ctrl`+`Enter` (Windows), or `Command`+`Enter` (Mac) and either putting your cursor on a line to run the entire line, or highlighting a subsection of code to run just that portion.
+These scripts are designed to read by R from top to bottom when you hit the ![](pictures/source.png) button, or `Ctrl`+`Shift`+`S` (Windows), or `Command`+`Shift`+`S` (Mac). Alternatively, you can run portions of your code with `Ctrl`+`Enter` (Windows), or `Command`+`Enter` (Mac) and either putting your cursor on a line to run the entire line, or highlighting a subsection of code to run just that portion. This will allow us to build multi-step data processing and analysis scripts.
 
 >**Pro-tip**
 >If you don't want R to read something, us the `#`. Anything that is preceded by a `#` is regarded as a 'comment' by R and it does not try to execute those lines (i.e. R ignores anything after a `#`). 
@@ -205,22 +205,255 @@ What is the value of `x` after running all the lines and why?
 
 ## Indexing and dimensions
 
+We already mentioned that we can have multiple values in an object, but so far this has been in only 1 dimension, but using `matrix()` (2D) and `array()` (>2D) we can store numbers in multiple dimensions
+
+```{r}
+# make a matrix
+x <- matrix(data = c(1,1,2,5,3,4), nrow = 2, ncol = 3)
+
+x
+
+# make an array
+
+y <- array(data = c(1:8), dim = c(2,2,2))
+
+y
+```
+
+>**Exercise**
+>
+> Try storing numeric and character strings in a matrix (or an array). What happens to the numerics?
+
+That's great that we can store this data in multiple dimensions, but how do I get it back? That's what `[]` are for!
+
+```{r}
+# in 1D
+x <- c(1,2,3,4,6,34,2,1,5,6,7)
+# if we want the 7th value
+x[7]
+# if we want the 2nd and 7th value
+x[c(2,7)]
+# if we want only values greater than 10
+x[x>10]
+# whoa, that blew my mind! How did that work?
+# well indexing works by giving the numeric index, or a logical vector the length of the vector we're working with
+# so x>10 produces a logical vector the length of x
+x>10
+
+# in 2D
+x <- matrix(data = c(1,1,2,5,3,4), nrow = 2, ncol = 3)
+# this works similar, but you need to provide 2 numbers (or 2 vectors of numbers), for row number and for column number
+x[1,3]
+x[c(1,2),1]
+# if you leave one dimension blank, the whole row or column will be returned
+x[,1]
+x[2,]
+
+# in 3D, add another dimension!
+x <- array(data = c(1:24), dim = c(2,3,4))
+x[1,2,3]
+x[,,3]
+```
 
 
-## Making your own functions
+Data frames (`data.frame()`) are a special type of matrix that can hold numeric and character strings (and logicals, factors, geometries, etc) without having to convert them all to a single type. It's effectively a collection of vectors of the same length.
 
+```{r}
+# make a data frame
+x <- data.frame(nums = c(1,2,3),
+                chars = c("one","two","three"),
+                logis = c(TRUE, FALSE, TRUE))
 
-## What are 'packages'?
+# print the whole thing to the console
+x
 
+# or for a very big dataframe, you may want to use head to see the top 5 rows
+head(x)
+
+# use the str function to see it's structure
+str(x)
+
+```
+>**Pro-tip**
+>
+> Did you notice that the structure of chars was `Factor` and not `chr`? Factors are a special type of of character string vector that conserves information about the vector's 'levels' (and you can also order those levels). Many functions, such as `data.frame()` have an argument called `stringsAsFactors` and is usually set to `TRUE` by default, you may want to set this to `FALSE`. Often, these are interchangeable, but I have had **many frustrating errors** because I mistakenly had a character string where I needed a factor and vice versa. Be aware that they are different and not knowing which one you have can lead to errors. You can easily convert back and forth with `as.factor` (or `as.ordered()`) and `as.character()`
+
+```{r}
+# let's try having both strings and factors in the data frame
+# make a data frame
+x <- data.frame(nums = c(1,2,3),
+                chars = c("one","two","three"),
+                facts = as.factor(c("one","two","three")),
+                logis = c(TRUE, FALSE, TRUE),
+                stringsAsFactors = FALSE)
+
+# print the whole thing to the console
+x
+
+# or for a very big dataframe, you may want to use head to see the top 5 rows
+head(x)
+
+# use the str function to see it's structure
+str(x)
+
+```
+
+Indexing in dataframes can be the same as for a 2D matrix, or you can use `$` to access columns by name
+
+```{r}
+# make a data frame
+x <- data.frame(nums = c(1,2,3),
+                chars = c("one","two","three"),
+                facts = as.factor(c("one","two","three")),
+                logis = c(TRUE, FALSE, TRUE),
+                stringsAsFactors = FALSE)
+
+x[1,2]
+x[,2]
+x$chars
+
+# and you can also treat these columns as 1D vectors
+x$chars[1]
+
+```
 
 ## Reading in data
+That's all great, but our data is store in a `.csv` file, how do we get that? The simplest way is to use the `read.csv()` function. But we need to know where on the computer the file is stored.
+
+The first step is to load your data and to create a project. If you haven't done so already, please download the [zip file](https://github.com/remi-daigle/2017-CHONe-Data/archive/gh-pages.zip) the entire  github [project repository](https://github.com/remi-daigle/2017-CHONe-Data/) (contains data files, and all the R scripts used to make this very website!) and extract it somewhere convenient.
+
+Go back to the project folder you extracted and open the `2017-CHONe-Data.Rproj` file. This is an R project file that allows you to set a number of options for the project (see [here](https://support.rstudio.com/hc/en-us/articles/200526207-Using-Projects)), but for our purposes just know that the project file is setting the 'working directory', it tells R where all your files are.
+
+```{r}
+# you can hard code the whole file path, but try to never do that!
+# your computer may not have a C drive, and your name almost certainly is not Remi, so this will not work for you
+
+# dataset <- read.csv("C:/Users/Remi-Work/Desktop/2017-CHONe-Data/rawdata/larval abundance.csv")
+
+# The above is unsurprisingly not reproducible! Always use relative paths!
+# Relative paths are a shortened version of the above, you only need to type what comes after the project directory
+# REMINDER: The project directory is where the .Rproj file is stored
+
+dataset <- read.csv("rawdata/larval abundance.csv", stringsAsFactors = FALSE)
+
+# writing it this way (relative path) means that your project is reproducible since you can move this whole directory to another location on your computer OR ANY OTHER COMPUTER!!!
+
+```
+
+## Cleaning data in R
+
+Common errors in data are:
+
+- trailing or leading white spaces in character strings
+- data entered in different formats (e.g. numbers and character strings in one column)
+- data entered with wrong units
 
 
+The first step I always take is to make sure that the data loaded in as expected. Head over to the Environment window and click on `data`. You can do (temporary) sorting and filtering of the data in the data viewer. I also use the `str()` function to make sure all the variables (columns) are of the correct type.
+```{r}
+str(dataset)
+```
 
-# Homework
-install all the packages
+If I wanted to make a correction manually, we can use indexing:
+```{r}
+# say for example, I knew that the second observation was in fact taken at 12 m depth
+dataset$depth[2]
+
+# the value in the data frame is indeed 3 WRONG! Let,s correct it 
+dataset$depth[2] <- 12
+head(dataset)
+
+# The other issue you may notice is that my months values are mostly numbers, but there's at least 1 "August" in there
+# We could correct just that one we see on line 4
+dataset$month[4] <- 8
+
+# Or we could get rid of all the "August"'s in one pass
+dataset$month[dataset$month=="August"] <- 8
+
+# but that column is still a character string, let's convert it to numeric
+dataset$month <- as.numeric(dataset$month)
+
+str(dataset)
+
+```
 
 
+If you were wondering how many years I had sampled, you could do:
+```{r}
+unique(dataset$year)
 
+# or for time
+unique(dataset$time)
+
+# as you can see there are a few trailing white spaces, to do text substitutions, let's use gsub()
+# but first let's see how this works; it matches a pattern in x and replaces it.
+
+gsub(pattern = "ABC",replacement = "XYZ",x = "TUVWABC")
+
+gsub(pattern = "doesn't work",replacement = "works",x = "If this sentence no longer contains the pattern, then gsub doesn't work")
+
+# So now, let's use gsub to remove those spaces. The patter we are matching is just a space and the replacement is nothing, so that will remove white spaces
+
+dataset$time <- gsub(pattern = " ",replacement = "",x = dataset$time)
+
+```
+
+Feel the power! The `gsub()` function is very powerful and the pattern matching works based on 'regular expressions' (which is a nearly universal pattern matching language/protocol). For example, if you had spaces you wanted to keep and only wanted to remove white spaces at the end, you could use `pattern = " +$"` since the dollar sign in regex means 'ends with' and the plus means 'one or more', so gsub would match one or more spaces at the end of a character string. You can practice your 'regex' with [regexpal](http://www.regexpal.com/) and this [cheatsheet](http://www.rexegg.com/regex-quickstart.html)
+
+Other useful things you should check are the minimum and maximum values for each column to make sure things were entered all in the same order of magnitude, or a even a quick histogram
+
+```{r}
+min(dataset$Margarites.spp.)
+max(dataset$Margarites.spp.)
+hist(dataset$Margarites.spp.)
+
+```
+
+Everything now seems reasonable to me, but it is your responsibility to check that each column of your data 'makes sense'. But for sake of time, lets move on!
+
+## Making your own functions and packages
+
+Part of R's awesomeness is that it already comes with a lot of functions that are very useful for everyday science. Additionally, there are many `packages` which are essentially collections of new functions and help files generated by users like you and me that add to the already broad functionality of R.
+
+*Warning: shameless self promotion below!*
+
+Here is a package I created called [BESTMPA](https://github.com/remi-daigle/BESTMPA) and the peer-reviewed paper describing it: [An adaptable toolkit to assess commercial fishery costs and benefits related to marine protected area network design](https://f1000research.com/articles/4-1234/v2)
+
+Making your own function follows the particular format below, let's make one called `custommean()`
+```{r}
+
+custommean <- function(x){
+    m <- sum(x)/length(x)
+    return(m)
+}
+
+# so we defined custommean as a function with arguments 'x', and it does what is inside the curly brackets
+# it will return m which is the mean of x.
+
+x <- c(1,2,3,6)
+
+# does it work?
+custommean(x = x)
+```
+
+If you make a few of those and write some help files to go along with them, you can make your own package. If you're interested see the "[R packages](http://r-pkgs.had.co.nz/)" book by Hadley Wickham (Chief Scientist at RStudio, not the last time I will mention him), but making packages is beyond the scope of what I can cover in this workshop
+
+Anyway, there is a central organization called 'Comprehensive R Archive Network' or CRAN which houses all the official package, but there are also other packages (like mine), as well as the development version of many of the official packages on github that are worth taking a look at.
+
+To install packages, you can either use the Packages window at the bottom right, or you can do it with written commands (my preference). Here are a few we will use tomorrow, try installing them now and let us know if you get any errors.
+
+```{r, eval=FALSE}
+
+install.packages('tidyverse') # The tidyverse is a collection of R packages that share common philosophies and are designed to work together. (e.g. ggplot2, dplyr, tidyr)
+
+install.packages('marmap') # Import xyz data from the NOAA (National Oceanic and Atmospheric Administration, <http://www.noaa.gov>), GEBCO (General Bathymetric Chart of the Oceans, <http://www.gebco.net>) and other sources, plot xyz data to prepare publication-ready figures
+
+install.packages('raster') # Reading, writing, manipulating, analyzing and modeling of gridded spatial data (and also getting access to GADM basemaps)
+
+install.packages('devtools') # Allows you to install packages from github
+
+# the 'robis' package on CRAN does not work with the latest version of R (yet), so we need to get the latest version from github
+devtools::install_github("iobis/robis")
+```
 
 [<<BACK](https://remi-daigle.github.io/2017-CHONe-Data/)
