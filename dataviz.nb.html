@@ -292,7 +292,165 @@ div.tocify {
 </div>
 <div id="the-sf-package" class="section level3">
 <h3>The <code>sf</code> package</h3>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeSh0aWR5dmVyc2UpXG5saWJyYXJ5KHNmKVxubGlicmFyeShyb2JpcylcbmxpYnJhcnkobWFybWFwKVxubGlicmFyeShyYXN0ZXIpXG4jIGxpYnJhcnkoKVxuYGBgIn0= -->
+<pre class="r"><code>library(tidyverse)
+library(sf)
+library(robis)
+library(marmap)
+library(raster)
+# library()</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
 </div>
+</div>
+<div id="plot-your-study-site" class="section level2">
+<h2>Plot your study site</h2>
+<div id="define-site-map-limits" class="section level3">
+<h3>Define site map limits</h3>
+<p>Let’s start by defining a bounding box for your study site:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI2RlZmluZSB0aGUgY29ybmVyc1xubGF0bWF4IDwtIDQ2LjI1XG5sYXRtaW4gPC0gNDUuNVxubG9ubWF4IDwtIC02MS4yNVxubG9ubWluIDwtIC02Mi4yNVxuXG4jY3JlYXRlIGEgbWF0cml4XG5iYm1hdCA8LSBjYmluZChcbiAgICAgICAgICAgIGMobG9ubWluLGxvbm1heCxsb25tYXgsbG9ubWluLGxvbm1pbiksXG4gICAgICAgICAgICBjKGxhdG1pbixsYXRtaW4sbGF0bWF4LGxhdG1heCxsYXRtaW4pXG4gICAgICAgIClcbiMgbWFrZSB0aGUgbWF0cml4IGEgJ3NpbXBsZSBmZWF0dXJlcycgcG9seWdvblxuYmJzZiA8LSBzdF9wb2x5Z29uKGxpc3QoYmJtYXQpKVxuIyBhbmQgbGV0J3MgZ2l2ZSBpdCBpbmZvcm1hdGlvbiBhYm91dCB0aGUgcHJvamVjdGlvbjpcbmJic2ZjIDwtIHN0X3NmYyhiYnNmLGNycz1cIitwcm9qPWxvbmdsYXQgK2RhdHVtPVdHUzg0XCIpXG4jIGZpbmFsbHksIGxldCdzIG1ha2UgaXQgYSBzaW1wbGUgZmVhdHVyZXMgZGF0YS5mcmFtZVxuYmIgPC0gc3Rfc2YobmFtZT1cIlN0dWR5IFNpdGVcIixnZW9tZXRyeT1iYnNmYylcbnN0cihiYilcblxuIyBwbG90IGl0IVxuZ2dwbG90KGJiKStcbiAgICBnZW9tX3NmKClcbmBgYCJ9 -->
+<pre class="r"><code>#define the corners
+latmax &lt;- 46.25
+latmin &lt;- 45.5
+lonmax &lt;- -61.25
+lonmin &lt;- -62.25
+
+#create a matrix
+bbmat &lt;- cbind(
+            c(lonmin,lonmax,lonmax,lonmin,lonmin),
+            c(latmin,latmin,latmax,latmax,latmin)
+        )
+# make the matrix a 'simple features' polygon
+bbsf &lt;- st_polygon(list(bbmat))
+# and let's give it information about the projection:
+bbsfc &lt;- st_sfc(bbsf,crs=&quot;+proj=longlat +datum=WGS84&quot;)
+# finally, let's make it a simple features data.frame
+bb &lt;- st_sf(name=&quot;Study Site&quot;,geometry=bbsfc)
+str(bb)
+
+# plot it!
+ggplot(bb)+
+    geom_sf()</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Riveting!</p>
+</div>
+<div id="add-a-basemap" class="section level3">
+<h3>Add a basemap!</h3>
+<p>There are many ways to add a basemap in R</p>
+</div>
+</div>
+<div id="marmap-package" class="section level2">
+<h2>marmap package</h2>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYmF0aHltZXRyeSA8LSBnZXROT0FBLmJhdGh5KGxvbm1pbixsb25tYXgsbGF0bWluLGxhdG1heCxyZXNvbHV0aW9uPTEsa2VlcD1UUlVFKVxucGxvdC5iYXRoeShiYXRoeW1ldHJ5LGltYWdlPVQsZHJhd2xhYmVscz1UUlVFKVxuXG5ibHVlcyA8LSBjb2xvclJhbXBQYWxldHRlKGMoXCJkYXJrYmx1ZVwiLCBcImxpZ2h0Ymx1ZTFcIikpXG5ncmV5cyA8LSBjb2xvclJhbXBQYWxldHRlKGMoZ3JleSgwLjQpLGdyZXkoMC45OSkpKVxuXG5wbG90LmJhdGh5KGJhdGh5bWV0cnksXG4gICAgICAgICAgIGltYWdlID0gVFJVRSxcbiAgICAgICAgICAgbGFuZCA9IFRSVUUsXG4gICAgICAgICAgIG49MCxcbiAgICAgICAgICAgYnBhbCA9IGxpc3QoYygwLCBtYXgoYmF0aHltZXRyeSksIGdyZXlzKDEwMCkpLFxuICAgICAgICAgICAgICAgICAgICAgICBjKG1pbihiYXRoeW1ldHJ5KSwgMCwgYmx1ZXMoMTAwKSkpKVxuXG4jIHRoaXMgaXMgYSAnYmF0aHknIG9iamVjdCBhbmQgeW91IGNvdWxkIHBsb3QgaXQgYXMgaXMgd2l0aCB0aGUgdG9vbHMgcHJvdmlkZWQgaW4gbWFybWFwLCBidXQgdG8ga2VlcCB0aGluZ3MgJ3NpbXBsZScgSSdtIGdvaW5nIHRvIGNvbnZlcnQgdG8gc2YuIFRoZXJlIGlzIG5vIGRpcmVjdCBtZXRob2QgeWV0LCBzby4uLiBkb24ndCBqdWRnZSBtZSFcbiMgY29udmVydCBmcm9tIGJhdGh5IHRvIHJhc3RlciB0byAnc3AnIHBvbHlnb24gdG8gc2ltcGxlIGZlYXR1cmVzXG4jIGJhdGh5cG9seSA8LSBtYXJtYXA6OmFzLnJhc3RlcihiYXRoeW1ldHJ5KSAlPiUgXG4gICAgIyByYXN0ZXJUb1BvbHlnb25zKCkgJT4lIHN0X2FzX3NmXG5iYXRoeXJhcyA8LSBmb3J0aWZ5LmJhdGh5KGJhdGh5bWV0cnkpXG5cbmJhdGh5cmFzJHpbYmF0aHlyYXMkej4wXSA8LSBOQVxuXG5nZ3Bsb3QoKSArXG4gICAgZ2VvbV9yYXN0ZXIoZGF0YT1iYXRoeXJhcyxhZXMoeD14LHk9eSxmaWxsPXopKStcbiAgICBnZW9tX3NmKGRhdGE9YmIsZmlsbD1cInRyYW5zcGFyZW50XCIsY29sb3VyPSdibGFjaycpXG5gYGAifQ== -->
+<pre class="r"><code>bathymetry &lt;- getNOAA.bathy(lonmin,lonmax,latmin,latmax,resolution=1,keep=TRUE)
+plot.bathy(bathymetry,image=T,drawlabels=TRUE)
+
+blues &lt;- colorRampPalette(c(&quot;darkblue&quot;, &quot;lightblue1&quot;))
+greys &lt;- colorRampPalette(c(grey(0.4),grey(0.99)))
+
+plot.bathy(bathymetry,
+           image = TRUE,
+           land = TRUE,
+           n=0,
+           bpal = list(c(0, max(bathymetry), greys(100)),
+                       c(min(bathymetry), 0, blues(100))))
+
+# this is a 'bathy' object and you could plot it as is with the tools provided in marmap, but to keep things 'simple' I'm going to convert to sf. There is no direct method yet, so... don't judge me!
+# convert from bathy to raster to 'sp' polygon to simple features
+# bathypoly &lt;- marmap::as.raster(bathymetry) %&gt;% 
+    # rasterToPolygons() %&gt;% st_as_sf
+bathyras &lt;- fortify.bathy(bathymetry)
+
+bathyras$z[bathyras$z&gt;0] &lt;- NA
+
+ggplot() +
+    geom_raster(data=bathyras,aes(x=x,y=y,fill=z))+
+    geom_sf(data=bb,fill=&quot;transparent&quot;,colour='black')</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuQ2FuYWRhIDwtIGdldERhdGEoJ0dBRE0nLCBjb3VudHJ5PVwiQ0FOXCIsIGxldmVsPTEpICU+JSBcbiAgICBzdF9hc19zZigpICU+JSBcbiAgICBmaWx0ZXIoTkFNRV8xPT1cIk5vdmEgU2NvdGlhXCJ8XG4gICAgICAgICAgICAgICBOQU1FXzE9PVwiUHJpbmNlIEVkd2FyZCBJc2xhbmRcInxcbiAgICAgICAgICAgICAgIE5BTUVfMT09XCJOZXcgQnJ1bnN3aWNrXCIpXG5nZ3Bsb3QoKSArXG4gICAgZ2VvbV9zZihkYXRhPUNhbmFkYSxhZXMoZmlsbD1OQU1FXzEpKVxuXG54PTAuMlxuZ2dwbG90KCkgK1xuICAgIGdlb21fcmFzdGVyKGRhdGE9YmF0aHlyYXMsYWVzKHg9eCx5PXksZmlsbD16KSkrXG4gICAgZ2VvbV9zZihkYXRhPWJiLGZpbGw9XCJ0cmFuc3BhcmVudFwiLGNvbG91cj0neWVsbG93JyxzaXplPTIpK1xuICAgIGdlb21fc2YoZGF0YT1DYW5hZGEsZmlsbD0nZ3JleTQwJykrXG4gICAgY29vcmRfc2YoeGxpbSA9IGMobG9ubWluLXgsbG9ubWF4K3gpLFxuICAgICAgICAgICAgIHlsaW0gPSBjKGxhdG1pbi14LGxhdG1heCt4KSxcbiAgICAgICAgICAgICBleHBhbmQgPSBGKSBcblxuYGBgIn0= -->
+<pre class="r"><code>Canada &lt;- getData('GADM', country=&quot;CAN&quot;, level=1) %&gt;% 
+    st_as_sf() %&gt;% 
+    filter(NAME_1==&quot;Nova Scotia&quot;|
+               NAME_1==&quot;Prince Edward Island&quot;|
+               NAME_1==&quot;New Brunswick&quot;)
+ggplot() +
+    geom_sf(data=Canada,aes(fill=NAME_1))
+
+x=0.2
+ggplot() +
+    geom_raster(data=bathyras,aes(x=x,y=y,fill=z))+
+    geom_sf(data=bb,fill=&quot;transparent&quot;,colour='yellow',size=2)+
+    geom_sf(data=Canada,fill='grey40')+
+    coord_sf(xlim = c(lonmin-x,lonmax+x),
+             ylim = c(latmin-x,latmax+x),
+             expand = F) 
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="get-data-from-obis" class="section level2">
+<h2>Get data from OBIS</h2>
+<p>OBIS is the <a href="http://www.iobis.org/">Ocean Biogeographic Information System</a> and their vision is: “To be the most comprehensive gateway to the world’s ocean biodiversity and biogeographic data and information required to address pressing coastal and world ocean concerns.”</p>
+<p>We can get access to their HUGE database through the excellent <code>robis</code> package by <a href="https://ropensci.org/">ropensci</a> (unsurprisingly, they also have other great open science R packages)</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjpbInN0X2FzX3RleHQoYmIkZ2VvbWV0cnkpIiwiT0JJUyA8LSBvY2N1cnJlbmNlKGdlb21ldHJ5PXN0X2FzX3RleHQoYmIkZ2VvbWV0cnkpKSIsIndyaXRlLmNzdihPQklTLCdvYmlzLmNzdicscm93Lm5hbWVzID0gRkFMU0UpIl19 -->
+<pre class="r"><code>st_as_text(bb$geometry)
+OBIS &lt;- occurrence(geometry=st_as_text(bb$geometry))
+write.csv(OBIS,'obis.csv',row.names = FALSE)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuT0JJUyA8LSByZWFkLmNzdihcIm9iaXMuY3N2XCIpXG5PQklTIDwtIHN0X2FzX3NmKE9CSVMsXG4gICAgICAgICAgICAgICAgIGNvb3JkcyA9IGMoXCJkZWNpbWFsTG9uZ2l0dWRlXCIsIFwiZGVjaW1hbExhdGl0dWRlXCIpLFxuICAgICAgICAgICAgICAgICBjcnM9XCIrcHJvaj1sb25nbGF0ICtkYXR1bT1XR1M4NFwiLFxuICAgICAgICAgICAgICAgICByZW1vdmU9RkFMU0UpICU+JSBcbiAgICBmaWx0ZXIoIWlzLm5hKHNwZWNpZXMpKVxuXG5nZ3Bsb3QoKSArXG4gICAgZ2VvbV9yYXN0ZXIoZGF0YT1iYXRoeXJhcyxhZXMoeD14LHk9eSxmaWxsPXopKStcbiAgICBnZW9tX3NmKGRhdGE9YmIsZmlsbD1cInRyYW5zcGFyZW50XCIsY29sb3VyPSd5ZWxsb3cnLHNpemU9MikrXG4gICAgZ2VvbV9zZihkYXRhPUNhbmFkYSxmaWxsPSdncmV5NDAnKStcbiAgICBnZW9tX3BvaW50KGRhdGE9T0JJUyxhZXMoY29sb3VyPXBoeWx1bSx4PWRlY2ltYWxMb25naXR1ZGUseT1kZWNpbWFsTGF0aXR1ZGUsc2l6ZT0yKSkrXG4gICAgY29vcmRfc2YoeGxpbSA9IGMobG9ubWluLXgsbG9ubWF4K3gpLFxuICAgICAgICAgICAgIHlsaW0gPSBjKGxhdG1pbi14LGxhdG1heCt4KSxcbiAgICAgICAgICAgICBleHBhbmQgPSBGKVxuYGBgIn0= -->
+<pre class="r"><code>OBIS &lt;- read.csv(&quot;obis.csv&quot;)
+OBIS &lt;- st_as_sf(OBIS,
+                 coords = c(&quot;decimalLongitude&quot;, &quot;decimalLatitude&quot;),
+                 crs=&quot;+proj=longlat +datum=WGS84&quot;,
+                 remove=FALSE) %&gt;% 
+    filter(!is.na(species))
+
+ggplot() +
+    geom_raster(data=bathyras,aes(x=x,y=y,fill=z))+
+    geom_sf(data=bb,fill=&quot;transparent&quot;,colour='yellow',size=2)+
+    geom_sf(data=Canada,fill='grey40')+
+    geom_point(data=OBIS,aes(colour=phylum,x=decimalLongitude,y=decimalLatitude,size=2))+
+    coord_sf(xlim = c(lonmin-x,lonmax+x),
+             ylim = c(latmin-x,latmax+x),
+             expand = F)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZ2dwbG90KE9CSVMpICtcbiAgICBnZW9tX3Jhc3RlcihkYXRhPWJhdGh5cmFzLGFlcyh4PXgseT15LGZpbGw9eikpK1xuICAgIGdlb21fc2YoZGF0YT1iYixmaWxsPVwidHJhbnNwYXJlbnRcIixjb2xvdXI9J3llbGxvdycsc2l6ZT0yKStcbiAgICBnZW9tX3NmKGRhdGE9Q2FuYWRhLGZpbGw9J2dyZXk0MCcpK1xuICAgIGdlb21fcG9pbnQoZGF0YT1PQklTLGFlcyh4PWRlY2ltYWxMb25naXR1ZGUseT1kZWNpbWFsTGF0aXR1ZGUpKStcbiAgICBmYWNldF93cmFwKH5waHlsdW0pK1xuICAgIGNvb3JkX3NmKHhsaW0gPSBjKGxvbm1pbi14LGxvbm1heCt4KSxcbiAgICAgICAgICAgICB5bGltID0gYyhsYXRtaW4teCxsYXRtYXgreCksXG4gICAgICAgICAgICAgZXhwYW5kID0gRilcbmBgYCJ9 -->
+<pre class="r"><code>ggplot(OBIS) +
+    geom_raster(data=bathyras,aes(x=x,y=y,fill=z))+
+    geom_sf(data=bb,fill=&quot;transparent&quot;,colour='yellow',size=2)+
+    geom_sf(data=Canada,fill='grey40')+
+    geom_point(data=OBIS,aes(x=decimalLongitude,y=decimalLatitude))+
+    facet_wrap(~phylum)+
+    coord_sf(xlim = c(lonmin-x,lonmax+x),
+             ylim = c(latmin-x,latmax+x),
+             expand = F)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
 </div>
 </div>
 <div id="important-links" class="section level1">
@@ -302,7 +460,7 @@ div.tocify {
 <!-- rnb-text-end -->
 </div>
 
-<div id="rmd-source-code">LS0tDQp0aXRsZTogIkRhdGEgQW5hbHlzaXMgYW5kIFZpc3VhbGl6YXRpb24gaW4gUiINCm91dHB1dDoNCiAgaHRtbF9kb2N1bWVudDoNCiAgICB0b2M6IHllcw0KICAgIHRvY19mbG9hdDogeWVzDQogIGh0bWxfbm90ZWJvb2s6DQogICAgdG9jOiB5ZXMNCiAgICB0b2NfZmxvYXQ6IHllcw0KLS0tDQpbPDxCQUNLXShodHRwczovL3JlbWktZGFpZ2xlLmdpdGh1Yi5pby8yMDE3LUNIT05lLURhdGEvKQ0KKFJlbWkvRGF2aWQpDQoNCiMgVGhlIGB0aWR5dmVyc2VgICdtZXRhJyBwYWNrYWdlDQoNCiMjIFRoZSBgZHBseXJgIHBhY2thZ2UNCg0KIyMgVGhlIGB0aWR5cmAgcGFja2FnZQ0KDQojIyBUaGUgYGdncGxvdDJgIHBhY2thZ2UNCg0KIyBNYXBwaW5nDQoNCiMjIFRoZSBjbGFzc2ljIGFuZCB0aGUgY3V0dGluZyBlZGdlOiBgc3BgIHZzIGBzZmANCg0KIyMjIFRoZSBgc3BgIHBhY2thZ2UNCg0KIyMjIFRoZSBgc2ZgIHBhY2thZ2UNCg0KIyBJbXBvcnRhbnQgbGlua3MNCkEgW0dJUyB0dXRvcmlhbF0oaHR0cDovL3JlbWktZGFpZ2xlLmdpdGh1Yi5pby9HSVNfbWFwcGluZ19pbl9SLykgd3JpdHRlbiBieSBSZW1pIChtb3N0bHkgaW4gYHNwYCkNCg0KWzw8QkFDS10oaHR0cHM6Ly9yZW1pLWRhaWdsZS5naXRodWIuaW8vMjAxNy1DSE9OZS1EYXRhLykNCg==</div>
+<div id="rmd-source-code">LS0tDQp0aXRsZTogIkRhdGEgQW5hbHlzaXMgYW5kIFZpc3VhbGl6YXRpb24gaW4gUiINCm91dHB1dDoNCiAgaHRtbF9kb2N1bWVudDoNCiAgICB0b2M6IHllcw0KICAgIHRvY19mbG9hdDogeWVzDQogIGh0bWxfbm90ZWJvb2s6DQogICAgdG9jOiB5ZXMNCiAgICB0b2NfZmxvYXQ6IHllcw0KLS0tDQpbPDxCQUNLXShodHRwczovL3JlbWktZGFpZ2xlLmdpdGh1Yi5pby8yMDE3LUNIT05lLURhdGEvKQ0KKFJlbWkvRGF2aWQpDQoNCiMgVGhlIGB0aWR5dmVyc2VgICdtZXRhJyBwYWNrYWdlDQoNCiMjIFRoZSBgZHBseXJgIHBhY2thZ2UNCg0KIyMgVGhlIGB0aWR5cmAgcGFja2FnZQ0KDQojIyBUaGUgYGdncGxvdDJgIHBhY2thZ2UNCg0KIyBNYXBwaW5nDQoNCiMjIFRoZSBjbGFzc2ljIGFuZCB0aGUgY3V0dGluZyBlZGdlOiBgc3BgIHZzIGBzZmANCg0KIyMjIFRoZSBgc3BgIHBhY2thZ2UNCg0KIyMjIFRoZSBgc2ZgIHBhY2thZ2UNCg0KYGBge3IsbG9hZCBwYWNrYWdlcyxtZXNzYWdlPUZBTFNFfQ0KbGlicmFyeSh0aWR5dmVyc2UpDQpsaWJyYXJ5KHNmKQ0KbGlicmFyeShyb2JpcykNCmxpYnJhcnkobWFybWFwKQ0KbGlicmFyeShyYXN0ZXIpDQojIGxpYnJhcnkoKQ0KYGBgDQoNCiMjUGxvdCB5b3VyIHN0dWR5IHNpdGUNCiMjIyBEZWZpbmUgc2l0ZSBtYXAgbGltaXRzDQpMZXQncyBzdGFydCBieSBkZWZpbmluZyBhIGJvdW5kaW5nIGJveCBmb3IgeW91ciBzdHVkeSBzaXRlOg0KDQpgYGB7ciwgYm91bmRpbmcgYm94fQ0KI2RlZmluZSB0aGUgY29ybmVycw0KbGF0bWF4IDwtIDQ2LjI1DQpsYXRtaW4gPC0gNDUuNQ0KbG9ubWF4IDwtIC02MS4yNQ0KbG9ubWluIDwtIC02Mi4yNQ0KDQojY3JlYXRlIGEgbWF0cml4DQpiYm1hdCA8LSBjYmluZCgNCiAgICAgICAgICAgIGMobG9ubWluLGxvbm1heCxsb25tYXgsbG9ubWluLGxvbm1pbiksDQogICAgICAgICAgICBjKGxhdG1pbixsYXRtaW4sbGF0bWF4LGxhdG1heCxsYXRtaW4pDQogICAgICAgICkNCiMgbWFrZSB0aGUgbWF0cml4IGEgJ3NpbXBsZSBmZWF0dXJlcycgcG9seWdvbg0KYmJzZiA8LSBzdF9wb2x5Z29uKGxpc3QoYmJtYXQpKQ0KIyBhbmQgbGV0J3MgZ2l2ZSBpdCBpbmZvcm1hdGlvbiBhYm91dCB0aGUgcHJvamVjdGlvbjoNCmJic2ZjIDwtIHN0X3NmYyhiYnNmLGNycz0iK3Byb2o9bG9uZ2xhdCArZGF0dW09V0dTODQiKQ0KIyBmaW5hbGx5LCBsZXQncyBtYWtlIGl0IGEgc2ltcGxlIGZlYXR1cmVzIGRhdGEuZnJhbWUNCmJiIDwtIHN0X3NmKG5hbWU9IlN0dWR5IFNpdGUiLGdlb21ldHJ5PWJic2ZjKQ0Kc3RyKGJiKQ0KDQojIHBsb3QgaXQhDQpnZ3Bsb3QoYmIpKw0KICAgIGdlb21fc2YoKQ0KYGBgDQoNClJpdmV0aW5nISANCg0KIyMjIEFkZCBhIGJhc2VtYXAhDQoNClRoZXJlIGFyZSBtYW55IHdheXMgdG8gYWRkIGEgYmFzZW1hcCBpbiBSDQoNCiMjIG1hcm1hcCBwYWNrYWdlDQoNCmBgYHtyLG1hcm1hcH0NCmJhdGh5bWV0cnkgPC0gZ2V0Tk9BQS5iYXRoeShsb25taW4sbG9ubWF4LGxhdG1pbixsYXRtYXgscmVzb2x1dGlvbj0xLGtlZXA9VFJVRSkNCnBsb3QuYmF0aHkoYmF0aHltZXRyeSxpbWFnZT1ULGRyYXdsYWJlbHM9VFJVRSkNCg0KYmx1ZXMgPC0gY29sb3JSYW1wUGFsZXR0ZShjKCJkYXJrYmx1ZSIsICJsaWdodGJsdWUxIikpDQpncmV5cyA8LSBjb2xvclJhbXBQYWxldHRlKGMoZ3JleSgwLjQpLGdyZXkoMC45OSkpKQ0KDQpwbG90LmJhdGh5KGJhdGh5bWV0cnksDQogICAgICAgICAgIGltYWdlID0gVFJVRSwNCiAgICAgICAgICAgbGFuZCA9IFRSVUUsDQogICAgICAgICAgIG49MCwNCiAgICAgICAgICAgYnBhbCA9IGxpc3QoYygwLCBtYXgoYmF0aHltZXRyeSksIGdyZXlzKDEwMCkpLA0KICAgICAgICAgICAgICAgICAgICAgICBjKG1pbihiYXRoeW1ldHJ5KSwgMCwgYmx1ZXMoMTAwKSkpKQ0KDQojIHRoaXMgaXMgYSAnYmF0aHknIG9iamVjdCBhbmQgeW91IGNvdWxkIHBsb3QgaXQgYXMgaXMgd2l0aCB0aGUgdG9vbHMgcHJvdmlkZWQgaW4gbWFybWFwLCBidXQgdG8ga2VlcCB0aGluZ3MgJ3NpbXBsZScgSSdtIGdvaW5nIHRvIGNvbnZlcnQgdG8gc2YuIFRoZXJlIGlzIG5vIGRpcmVjdCBtZXRob2QgeWV0LCBzby4uLiBkb24ndCBqdWRnZSBtZSENCiMgY29udmVydCBmcm9tIGJhdGh5IHRvIHJhc3RlciB0byAnc3AnIHBvbHlnb24gdG8gc2ltcGxlIGZlYXR1cmVzDQojIGJhdGh5cG9seSA8LSBtYXJtYXA6OmFzLnJhc3RlcihiYXRoeW1ldHJ5KSAlPiUgDQogICAgIyByYXN0ZXJUb1BvbHlnb25zKCkgJT4lIHN0X2FzX3NmDQpiYXRoeXJhcyA8LSBmb3J0aWZ5LmJhdGh5KGJhdGh5bWV0cnkpDQoNCmJhdGh5cmFzJHpbYmF0aHlyYXMkej4wXSA8LSBOQQ0KDQpnZ3Bsb3QoKSArDQogICAgZ2VvbV9yYXN0ZXIoZGF0YT1iYXRoeXJhcyxhZXMoeD14LHk9eSxmaWxsPXopKSsNCiAgICBnZW9tX3NmKGRhdGE9YmIsZmlsbD0idHJhbnNwYXJlbnQiLGNvbG91cj0nYmxhY2snKQ0KYGBgDQoNCg0KYGBge3J9DQpDYW5hZGEgPC0gZ2V0RGF0YSgnR0FETScsIGNvdW50cnk9IkNBTiIsIGxldmVsPTEpICU+JSANCiAgICBzdF9hc19zZigpICU+JSANCiAgICBmaWx0ZXIoTkFNRV8xPT0iTm92YSBTY290aWEifA0KICAgICAgICAgICAgICAgTkFNRV8xPT0iUHJpbmNlIEVkd2FyZCBJc2xhbmQifA0KICAgICAgICAgICAgICAgTkFNRV8xPT0iTmV3IEJydW5zd2ljayIpDQpnZ3Bsb3QoKSArDQogICAgZ2VvbV9zZihkYXRhPUNhbmFkYSxhZXMoZmlsbD1OQU1FXzEpKQ0KDQp4PTAuMg0KZ2dwbG90KCkgKw0KICAgIGdlb21fcmFzdGVyKGRhdGE9YmF0aHlyYXMsYWVzKHg9eCx5PXksZmlsbD16KSkrDQogICAgZ2VvbV9zZihkYXRhPWJiLGZpbGw9InRyYW5zcGFyZW50Iixjb2xvdXI9J3llbGxvdycsc2l6ZT0yKSsNCiAgICBnZW9tX3NmKGRhdGE9Q2FuYWRhLGZpbGw9J2dyZXk0MCcpKw0KICAgIGNvb3JkX3NmKHhsaW0gPSBjKGxvbm1pbi14LGxvbm1heCt4KSwNCiAgICAgICAgICAgICB5bGltID0gYyhsYXRtaW4teCxsYXRtYXgreCksDQogICAgICAgICAgICAgZXhwYW5kID0gRikgDQoNCmBgYA0KDQoNCiMjIEdldCBkYXRhIGZyb20gT0JJUw0KIA0KT0JJUyBpcyB0aGUgW09jZWFuIEJpb2dlb2dyYXBoaWMgSW5mb3JtYXRpb24gU3lzdGVtXShodHRwOi8vd3d3LmlvYmlzLm9yZy8pIGFuZCB0aGVpciB2aXNpb24gaXM6ICJUbyBiZSB0aGUgbW9zdCBjb21wcmVoZW5zaXZlIGdhdGV3YXkgdG8gdGhlIHdvcmxk4oCZcyBvY2VhbiBiaW9kaXZlcnNpdHkgYW5kIGJpb2dlb2dyYXBoaWMgZGF0YSBhbmQgaW5mb3JtYXRpb24gcmVxdWlyZWQgdG8gYWRkcmVzcyBwcmVzc2luZyBjb2FzdGFsIGFuZCB3b3JsZCBvY2VhbiBjb25jZXJucy4iDQogDQogV2UgY2FuIGdldCBhY2Nlc3MgdG8gdGhlaXIgSFVHRSBkYXRhYmFzZSB0aHJvdWdoIHRoZSBleGNlbGxlbnQgYHJvYmlzYCBwYWNrYWdlIGJ5IFtyb3BlbnNjaV0oaHR0cHM6Ly9yb3BlbnNjaS5vcmcvKSAodW5zdXJwcmlzaW5nbHksIHRoZXkgYWxzbyBoYXZlIG90aGVyIGdyZWF0IG9wZW4gc2NpZW5jZSBSIHBhY2thZ2VzKQ0KIA0KIA0KYGBge3IsZXZhbD1GQUxTRX0NCnN0X2FzX3RleHQoYmIkZ2VvbWV0cnkpDQpPQklTIDwtIG9jY3VycmVuY2UoZ2VvbWV0cnk9c3RfYXNfdGV4dChiYiRnZW9tZXRyeSkpDQp3cml0ZS5jc3YoT0JJUywnb2Jpcy5jc3YnLHJvdy5uYW1lcyA9IEZBTFNFKQ0KYGBgDQoNCmBgYHtyfQ0KT0JJUyA8LSByZWFkLmNzdigib2Jpcy5jc3YiKQ0KT0JJUyA8LSBzdF9hc19zZihPQklTLA0KICAgICAgICAgICAgICAgICBjb29yZHMgPSBjKCJkZWNpbWFsTG9uZ2l0dWRlIiwgImRlY2ltYWxMYXRpdHVkZSIpLA0KICAgICAgICAgICAgICAgICBjcnM9Iitwcm9qPWxvbmdsYXQgK2RhdHVtPVdHUzg0IiwNCiAgICAgICAgICAgICAgICAgcmVtb3ZlPUZBTFNFKSAlPiUgDQogICAgZmlsdGVyKCFpcy5uYShzcGVjaWVzKSkNCg0KZ2dwbG90KCkgKw0KICAgIGdlb21fcmFzdGVyKGRhdGE9YmF0aHlyYXMsYWVzKHg9eCx5PXksZmlsbD16KSkrDQogICAgZ2VvbV9zZihkYXRhPWJiLGZpbGw9InRyYW5zcGFyZW50Iixjb2xvdXI9J3llbGxvdycsc2l6ZT0yKSsNCiAgICBnZW9tX3NmKGRhdGE9Q2FuYWRhLGZpbGw9J2dyZXk0MCcpKw0KICAgIGdlb21fcG9pbnQoZGF0YT1PQklTLGFlcyhjb2xvdXI9cGh5bHVtLHg9ZGVjaW1hbExvbmdpdHVkZSx5PWRlY2ltYWxMYXRpdHVkZSxzaXplPTIpKSsNCiAgICBjb29yZF9zZih4bGltID0gYyhsb25taW4teCxsb25tYXgreCksDQogICAgICAgICAgICAgeWxpbSA9IGMobGF0bWluLXgsbGF0bWF4K3gpLA0KICAgICAgICAgICAgIGV4cGFuZCA9IEYpDQpgYGANCg0KYGBge3J9DQpnZ3Bsb3QoT0JJUykgKw0KICAgIGdlb21fcmFzdGVyKGRhdGE9YmF0aHlyYXMsYWVzKHg9eCx5PXksZmlsbD16KSkrDQogICAgZ2VvbV9zZihkYXRhPWJiLGZpbGw9InRyYW5zcGFyZW50Iixjb2xvdXI9J3llbGxvdycsc2l6ZT0yKSsNCiAgICBnZW9tX3NmKGRhdGE9Q2FuYWRhLGZpbGw9J2dyZXk0MCcpKw0KICAgIGdlb21fcG9pbnQoZGF0YT1PQklTLGFlcyh4PWRlY2ltYWxMb25naXR1ZGUseT1kZWNpbWFsTGF0aXR1ZGUpKSsNCiAgICBmYWNldF93cmFwKH5waHlsdW0pKw0KICAgIGNvb3JkX3NmKHhsaW0gPSBjKGxvbm1pbi14LGxvbm1heCt4KSwNCiAgICAgICAgICAgICB5bGltID0gYyhsYXRtaW4teCxsYXRtYXgreCksDQogICAgICAgICAgICAgZXhwYW5kID0gRikNCmBgYA0KDQojIEltcG9ydGFudCBsaW5rcw0KQSBbR0lTIHR1dG9yaWFsXShodHRwOi8vcmVtaS1kYWlnbGUuZ2l0aHViLmlvL0dJU19tYXBwaW5nX2luX1IvKSB3cml0dGVuIGJ5IFJlbWkgKG1vc3RseSBpbiBgc3BgKQ0KDQpbPDxCQUNLXShodHRwczovL3JlbWktZGFpZ2xlLmdpdGh1Yi5pby8yMDE3LUNIT05lLURhdGEvKQ0K</div>
 
 
 </div>
