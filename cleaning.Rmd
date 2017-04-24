@@ -440,6 +440,7 @@ If you make a few of those and write some help files to go along with them, you 
 
 Anyway, there is a central organization called 'Comprehensive R Archive Network' or CRAN which houses all the official package, but there are also other packages (like mine), as well as the development version of many of the official packages on github that are worth taking a look at.
 
+## Install packages for tomorrow
 To install packages, you can either use the Packages window at the bottom right, or you can do it with written commands (my preference). Here are a few we will use tomorrow, try installing them now and let us know if you get any errors.
 
 ```{r, eval=FALSE}
@@ -454,6 +455,9 @@ install.packages('devtools') # Allows you to install packages from github
 
 # the 'robis' package on CRAN does not work with the latest version of R (yet), so we need to get the latest version from github
 devtools::install_github("iobis/robis")
+
+# to gain access to the functions in a package, you can use library(), eg:
+library(tidyverse)
 ```
 
 [<<BACK](https://remi-daigle.github.io/2017-CHONe-Data/)
