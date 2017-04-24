@@ -477,6 +477,10 @@ install.packages('devtools') # Allows you to install packages from github
 # the 'robis' package on CRAN does not work with the latest version of R (yet), so we need to get the latest version from github
 devtools::install_github("iobis/robis")
 
+# you already have the CRAN version of ggplot2, but that version is not compatible with the sf package yet
+# So, we need the github version of ggplot2 as well!
+devtools::install_github("tidyverse/ggplot2")
+
 # to gain access to the functions in a package, you can use library(), eg:
 library(tidyverse)
 ```
