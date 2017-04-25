@@ -413,13 +413,13 @@ hist(larvalAbundance$Margarites.spp.)
 
 ```
 
-Lastly, there are some column names that are not 'up to code', so to avoid a stern talking to from CHONe's data manager, let's fix that now!
+Lastly, there are some column names that are not 'up to code', so to avoid a stern talking to from CHONe's data manager, let's fix that now! (Also, you may have noticed that latitude and longitude were swapped!)
 
 ```{r}
 names(larvalAbundance)
 
-names(larvalAbundance)[names(larvalAbundance)=="long"] <- "decimalLongitude"
-names(larvalAbundance)[names(larvalAbundance)=="lat"] <- "decimalLatitude"
+names(larvalAbundance)[names(larvalAbundance)=="long"] <- "decimalLatitude"
+names(larvalAbundance)[names(larvalAbundance)=="lat"] <- "decimalLongitude"
 names(larvalAbundance)[names(larvalAbundance)=="site"] <- "locationID"
 
 ```
