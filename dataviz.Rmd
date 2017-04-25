@@ -770,13 +770,131 @@ IndPerm3_byLocationID_bySpp <- larvalAbundanceLong %>%
               sd_depth= sd(depth))
 ```
 
+# Plotting
+R comes with basic plotting function, usually referred to as 'base plot', e.g: 
+
+```{r}
+plot(larvalAbundance$Margarites.spp.,larvalAbundance$Diaphana.minuta)
+```
+
+However, general concensus seems to be that `ggplot2` (part of the tidyverse) is the way to go for plotting. I (Remi) have mixed feelings about this package (my age is showing again). It does make making quick plots easier and is compatible with the rest of the tidyverse, but until recently, `ggplot2` really struggled with any spatial plotting (see '[The classic and the cutting edge: `sp` vs `sf`](https://remi-daigle.github.io/2017-CHONe-Data/dataviz.nb.html#The_classic_and_the_cutting_edge_sp_vs_sf)') so I had to know the base plot anyway. I still think base plot is more customizeable, but it may also be that I have not sufficiently mastered the ggplot world. We're mostly going to cover `ggplot2`, but be aware that there are other plotting paradigms in R (e.g. base, lattice, etc)
+
 ## The `ggplot2` package
+
+A system for 'declaratively' creating graphics, based on "[The Grammar of Graphics](http://www.springer.com/gp/book/9780387245447)". You provide the data, tell 'ggplot2' how to map variables to aesthetics, what graphical primitives to use, and it takes care of the details
+
+So for the same plot as above, let me walk you through each line below step by step. The first line creates a new blank ggplot plot. Some people set `aes()` and `data` in `ggplot()`, but since different layers can take different `aes()` and `data`, I like to set those in the geom functions. 
+
+Unlike other `tidyverse` functions, you can tie together `ggplot2` functions with `+` instead of `%>%`, but otherwise it works the same. So to our blank plot, we're adding `geom_point()` which is the function for a scatterplot. We're telling `geom_point()` that all the data it needs should be in `larvalAbundance` and what aesthetic mapping we want (`aes()`) which sets the variables used in the plot and takes arguments like `x`, `y`, `colour`, `size`. 
+
+Finally, I set the theme as `theme_classic` because the default plots are ugly! (try it, I dare you)
+# 
+
+```{r}
+ggplot() +
+    geom_point(data = larvalAbundance, aes(x=Margarites.spp.,y=Diaphana.minuta)) +
+    theme_classic()
+```
+
+Yeah, that was way more code than base plot just to get a simple plot! But now that we have the basic ggplot skeleton, our investment is going to pay off because it's now super easy to modify. Let's assign different colours for different depths.
+
+```{r}
+ggplot() +
+    geom_point(data = larvalAbundance, aes(x=Margarites.spp.,y=Diaphana.minuta,colour=as.character(depth))) +
+    theme_classic()
+```
+
+I had to convert `year` and `depth` to characters since ggplot assumes that numeric variables are continous. Let's combine what we learned above about the tidyverse.
+
+```{r}
+# prepare data for plotting
+larvalAbundancePlot <- larvalAbundance %>% 
+    mutate(Year = as.character(year),
+           Depth = as.character(depth))
+
+# plot new data
+ggplot() +
+    geom_point(data=larvalAbundancePlot,aes(x=Margarites.spp.,y=Diaphana.minuta,colour=Depth,shape=Year)) +
+    theme_classic()
+```
+
+Let's add a linear regression and make the axes log scale:
+
+```{r}
+ggplot() +
+    geom_point(data=larvalAbundancePlot,aes(x=Margarites.spp.,y=Diaphana.minuta,colour=Depth,shape=Year)) +
+    geom_smooth(method="lm")+
+    scale_x_log10()+
+    scale_y_log10()+
+    theme_classic()
+```
+
+Try commenting out (`#`) some of those lines to see what they do.
+
+Now that you understand how that works, let's try a few different plot types
+
+```{r}
+# prepare long data for plotting
+larvalAbundanceLongPlot <- larvalAbundanceLong %>% 
+    mutate(Year = as.character(year),
+           Depth = as.character(depth))
+
+# plot new data
+ggplot() +
+    geom_boxplot(data=larvalAbundanceLongPlot,aes(x=Depth,y=larvalAbundanceIndPerm3,fill=Depth)) +
+    scale_y_log10()+
+    theme_classic()
+```
+
+Ready to get your mind blown? By adding 1 line to the above, we can have a plot for each species
+
+```{r}
+ggplot() +
+    geom_boxplot(data=larvalAbundanceLongPlot,aes(x=Depth,y=larvalAbundanceIndPerm3,fill=Depth)) +
+    scale_y_log10()+
+    facet_wrap(~scientificName)+
+    theme_classic()
+```
+
+Or swapping out the geom gives you a completely different (better) plot.
+
+```{r}
+ggplot() +
+    geom_violin(data=larvalAbundanceLongPlot,aes(x=Depth,y=larvalAbundanceIndPerm3,fill=Depth)) +
+    scale_y_log10()+
+    facet_wrap(~scientificName)+
+    theme_classic()
+```
+
+Or swapping out the geom again and we can map the abundance.
+
+```{r}
+# prepare long data for plotting
+larvalAbundanceLongPlot <- larvalAbundanceLong %>% 
+    group_by(scientificName,decimalLongitude,decimalLatitude) %>% 
+    summarize(mean_IndPerm3 = mean(larvalAbundanceIndPerm3))
+
+# plot new mean data
+ggplot() +
+    geom_point(data=larvalAbundanceLongPlot,aes(x=decimalLongitude,y=decimalLatitude,size=log10(mean_IndPerm3))) +
+    facet_wrap(~scientificName)+
+    theme_classic()
+
+```
+
+Let's add a bit more to these maps with some proper mapping tools. But before we move away from ggplot, bookmark this excellent "[R Graph Catalog](http://shiny.stat.ubc.ca/r-graph-catalog/)". You can visually find a graph you want to make and get the code! Super useful!
 
 # Mapping
 
+You can always plot any spatial data and use latitude and longitude as normal Cartesian coordinates as we did above, but if you want to do anything with projections, or other GIS type operations (buffer, intersection, overlaps, etc), you really need to dig a little deeper
+
 ## The classic and the cutting edge: `sp` vs `sf`
 
+Before November 2016, if you wanted to do any spatial tasks in R your choice was a simple one. You needed to use the `sp` package (along with `rgeos`, and `rgdal`). Now, the `sf` package is replacing that set of packages, and that's a good thing because it allows for faster computation and **it is compatible with the `tidyverse`**. However, many of the helper packages that were built to interact with `sp` have not been upgraded to `sf` (yet).
+
 ### The `sp` package
+
+
 
 ### The `sf` package
 
