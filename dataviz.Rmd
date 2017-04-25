@@ -9,13 +9,766 @@ output:
     toc_float: yes
 ---
 [<<BACK](https://remi-daigle.github.io/2017-CHONe-Data/)
+
 (Remi/David)
+Now, if you remember what we did yesterday, we loaded and cleaned my larval abundance data, but I did not follow the principles of 'tidy' data when I uploaded my data.
+
+Again, this data comes from one of Remi's PhD thesis chapters[^1] that was part of the first CHONe. We cleaned in the [Data cleaning and raw data management](https://remi-daigle.github.io/2017-CHONe-Data/cleaning.nb.html) and is also archived on [Dryad](http://datadryad.org/handle/10255/dryad.59482) so we would have cleaning to do!
+
+[^1]: Daigle RM, Metaxas A, deYoung B (2014) Bay-scale patterns in the distribution, aggregation and spatial variability of larvae of benthic invertebrates. Marine Ecology Progress Series 503:139-156. http://dx.doi.org/10.3354/meps10734
+
+**Reminder**:
+The 'tidy' concept is something we will revisit in the R section, but the rules of tidy data are[^2]:
+
+1. Each variable you measure should be in one column
+2. Each different observation of that variable should be in a different row
+3. There should be one table for each “kind” of variable
+4. If you have multiple tables, they should include a column in the table that allows them to be linked
+
+While it was certainly easier to enter the abundance data in a spreadsheet by giving each species a column, this does not abide by the 'tidy' rules and we will have a much easier time analysing and plotting our data if we first 'tidy' the data.
+
+[^2]: [Jeff Leek, The Elements of Data Analytic Style, Leanpub, 2015-03-02](https://leanpub.com/datastyle)
+
+```{r,message=FALSE}
+# let's load all packages and the data before we begin
+library(sf)
+library(raster)
+library(marmap)
+library(robis)
+library(tidyverse)
+
+larvalAbundance <- read.csv("data/larvalAbundanceClean.csv", stringsAsFactors = FALSE)
+
+head(larvalAbundance)
+```
+
 
 # The `tidyverse` 'meta' package
 
-## The `dplyr` package
+The `tidyverse` is a package that is made up of other packages commonly used together for data analysis and vizualization. You can find much more detail in the book [R for Data Science](http://r4ds.had.co.nz/) by Garrett Grolemund and Hadley Wickham. Below we will learn about 3 of them:
+
+- `tidyr` for tidying data
+- `dplyr` for manipulating data
+- `ggplot2` for plotting data
 
 ## The `tidyr` package
+
+This aptly named package will allow us to tidy our data. Our data is currently in the wide format since we have multiple observations of species abundances in seperate columns. We want our data to be in the long format in order to facilitate analysis and plotting (and to abide by the 'tidy' rules).
+
+
+```{r widevslong,results='asis',echo=FALSE, message=FALSE}
+require(DiagrammeR)
+grViz('digraph html {
+      table1 [shape=none, margin=0, label=<
+      <TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1" CELLPADDING="6">
+      <TR>
+      <TD BGCOLOR="#FF0000" CELLPADDING="0">ID</TD>
+      <TD BGCOLOR="#FF7400" CELLPADDING="0">a1</TD>
+      <TD BGCOLOR="#009999" CELLPADDING="0">a2</TD>
+      <TD BGCOLOR="#00CC00" CELLPADDING="0">a3</TD>
+      </TR>
+      
+      <TR>
+      <TD BGCOLOR="#FF0000">1</TD>
+      <TD BGCOLOR="#FF7400"></TD>
+      <TD BGCOLOR="#009999"></TD>
+      <TD BGCOLOR="#00CC00"></TD>
+      </TR>
+      
+      <TR>
+      <TD BGCOLOR="#FF0000">2</TD>
+      <TD BGCOLOR="#FF7400"></TD>
+      <TD BGCOLOR="#009999"></TD>
+      <TD BGCOLOR="#00CC00"></TD>
+      </TR>
+      
+      <TR>
+      <TD BGCOLOR="#FF0000">3</TD>
+      <TD BGCOLOR="#FF7400"></TD>
+      <TD BGCOLOR="#009999"></TD>
+      <TD BGCOLOR="#00CC00"></TD>
+      </TR>
+      </TABLE>>];
+      
+      table2 [shape=none, margin=0,label=<
+      <TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1" CELLPADDING="6">
+      <TR>
+      <TD BGCOLOR="#FF0000" CELLPADDING="0">ID</TD>
+      <TD BGCOLOR="#FF0000" CELLPADDING="0">ID2</TD>
+      <TD BGCOLOR="#FF0000" CELLPADDING="0">A</TD>
+      </TR>
+      
+      <TR>
+      <TD BGCOLOR="#FF0000">1</TD>
+      <TD BGCOLOR="#FF7400">a1</TD>
+      <TD BGCOLOR="#FF7400"></TD>
+      </TR>
+      
+      <TR>
+      <TD BGCOLOR="#FF0000">2</TD>
+      <TD BGCOLOR="#FF7400">a1</TD>
+      <TD BGCOLOR="#FF7400"></TD>
+      </TR>
+      
+      <TR>
+      <TD BGCOLOR="#FF0000">3</TD>
+      <TD BGCOLOR="#FF7400">a1</TD>
+      <TD BGCOLOR="#FF7400"></TD>
+      </TR>
+      
+      <TR>
+      <TD BGCOLOR="#FF0000">1</TD>
+      <TD BGCOLOR="#009999">a2</TD>
+      <TD BGCOLOR="#009999"></TD>
+      </TR>
+      
+      <TR>
+      <TD BGCOLOR="#FF0000">2</TD>
+      <TD BGCOLOR="#009999">a2</TD>
+      <TD BGCOLOR="#009999"></TD>
+      </TR>
+      
+      <TR>
+      <TD BGCOLOR="#FF0000">3</TD>
+      <TD BGCOLOR="#009999">a2</TD>
+      <TD BGCOLOR="#009999"></TD>
+      </TR>
+      
+      <TR>
+      <TD BGCOLOR="#FF0000">1</TD>
+      <TD BGCOLOR="#00CC00">a3</TD>
+      <TD BGCOLOR="#00CC00"></TD>
+      </TR>
+      
+      <TR>
+      <TD BGCOLOR="#FF0000">2</TD>
+      <TD BGCOLOR="#00CC00">a3</TD>
+      <TD BGCOLOR="#00CC00"></TD>
+      </TR>
+      
+      <TR>
+      <TD BGCOLOR="#FF0000">3</TD>
+      <TD BGCOLOR="#00CC00">a3</TD>
+      <TD BGCOLOR="#00CC00"></TD>
+      </TR>
+      </TABLE>>];
+      
+      subgraph {
+      rank = same; table1; table2;
+      }
+      
+      
+      labelloc="t";
+      fontname="Courier";
+      label="wide  vs  long";
+      }
+      ')
+  
+
+```
+
+We currently have a few ID type variable (i.e. they are not observations; `year`,`month`,`day`,`time`,`depth`,`site`,`long`,`lat`) and an observational variable for each species.
+
+```{r}
+names(larvalAbundance)
+larvalAbundanceLong <- gather(larvalAbundance,                                  # the old data frame
+                              key = "scientificName",                           # what the column of old column names will be called
+                              value = "larvalAbundanceIndPerm3",                # what the gathered numbers will be called
+                              Astyris.lunata:Crangon.septemspinosa)             # which columns  to gather
+
+# alternatively, I could of specified which columns not to include instead
+larvalAbundanceLong <- gather(larvalAbundance,                                  # the old data frame
+                              key = "scientificName",                           # what the column of old column names will be called
+                              value = "larvalAbundanceIndPerm3",                # what the gathered numbers will be called
+                              -year,-month,-day,-time,-depth,-locationID,-decimalLongitude,-decimalLatitude)  # which columns not to gather
+
+head(larvalAbundanceLong)                           
+```
+
+We can also clean up and/or separate the `scientificName` column
+
+```{r}
+# first let's swap multiple species 
+larvalAbundanceLong <- separate(larvalAbundanceLong,           #old data frame
+                                col = scientificName,          # column to be seperated
+                                into = c("genus","species"),   # to be seperated into
+                                extra = "merge",               # if there are too many ".", what to do with the extra column
+                                remove = FALSE,                # whether to delete the seperated column
+                                sep = "\\.")                   # regex for ".", but need escape character "\\" since . is a wildcard
+
+# Let's check out our work
+head(larvalAbundanceLong)
+
+# genus and species don't look terrible, but scientificName still has that pesky period
+# we could use gsub again, but the regex is tricky since there are spp. for species
+# pasting the genus and species together will be much easier
+larvalAbundanceLong$scientificName <- paste(larvalAbundanceLong$genus,larvalAbundanceLong$species,sep = " ")
+
+# also, spp. is not a species designation, let's get rid of them
+larvalAbundanceLong$species[larvalAbundanceLong$species=="spp."] <- NA
+
+# Let's check out our work again
+head(larvalAbundanceLong)
+```
+
+
+## The `dplyr` package
+
+Manipulation of dataframes means many things to many researchers, we often
+select certain observations (rows) or variables (columns), we often group the
+data by a certain variable(s), or we even calculate summary statistics. We can
+do these operations using the normal base R operations:
+
+```{r}
+mean(larvalAbundanceLong[larvalAbundanceLong$scientificName == "Astyris lunata", "larvalAbundanceIndPerm3"])
+mean(larvalAbundanceLong[larvalAbundanceLong$scientificName == "Bittiolum alternatum", "larvalAbundanceIndPerm3"])
+mean(larvalAbundanceLong[larvalAbundanceLong$scientificName == "Arrhoges occidentalis", "larvalAbundanceIndPerm3"])
+```
+
+But this isn't very *nice* because there is a fair bit of repetition. Repeating
+yourself will cost you time, both now and later, and potentially introduce some
+nasty bugs.
+
+Luckily, the [`dplyr`](https://cran.r-project.org/web/packages/dplyr/dplyr.pdf)
+package provides a number of very useful functions for manipulating dataframes
+in a way that will reduce the above repetition, reduce the probability of making
+errors, and probably even save you some typing. As an added bonus, you might
+even find the `dplyr` grammar easier to read.
+
+Here we're going to cover 5 of the most commonly used functions as well as using
+pipes (`%>%`) to combine them.
+
+1. `select()`
+2. `filter()`
+3. `group_by()`
+4. `summarize()`
+5. `mutate()`
+
+### Using `select()`
+
+If, for example, we wanted to move forward with only a few of the variables in
+our dataframe we could use the `select()` function. This will keep only the
+variables you select.
+
+
+```{r select,results='asis',echo=FALSE, message=FALSE}
+grViz('digraph html {
+      table1 [shape=none, margin=0,label=<
+      <TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1" CELLPADDING="6">
+      <TR>
+      <TD PORT="f0" BGCOLOR="#FF0000" CELLPADDING="0">a</TD>
+      <TD BGCOLOR="#FF7400" CELLPADDING="0">b</TD>
+      <TD PORT="f1" BGCOLOR="#009999" CELLPADDING="0">c</TD>
+      <TD BGCOLOR="#00CC00" CELLPADDING="0">d</TD>
+      </TR>
+      
+      <TR>
+      <TD BGCOLOR="#FF0000"></TD>
+      <TD BGCOLOR="#FF7400"></TD>
+      <TD BGCOLOR="#009999"></TD>
+      <TD BGCOLOR="#00CC00"></TD>
+      </TR>
+      
+      <TR>
+      <TD BGCOLOR="#FF0000"></TD>
+      <TD BGCOLOR="#FF7400"></TD>
+      <TD BGCOLOR="#009999"></TD>
+      <TD BGCOLOR="#00CC00"></TD>
+      </TR>
+      
+      <TR>
+      <TD BGCOLOR="#FF0000"></TD>
+      <TD BGCOLOR="#FF7400"></TD>
+      <TD BGCOLOR="#009999"></TD>
+      <TD BGCOLOR="#00CC00"></TD>
+      </TR>
+      </TABLE>>];
+      
+      table2 [shape=none, margin=0, label=<
+      <TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1" CELLPADDING="6">
+      <TR>
+      <TD PORT="f0" BGCOLOR="#FF0000" CELLPADDING="0">a</TD>
+      <TD PORT="f1" BGCOLOR="#009999" CELLPADDING="0">c</TD>
+      </TR>
+      
+      <TR>
+      <TD BGCOLOR="#FF0000"></TD>
+      <TD BGCOLOR="#009999"></TD>
+      </TR>
+      
+      <TR>
+      <TD BGCOLOR="#FF0000"></TD>
+      <TD BGCOLOR="#009999"></TD>
+      </TR>
+      
+      <TR>
+      <TD BGCOLOR="#FF0000"></TD>
+      <TD BGCOLOR="#009999"></TD>
+      </TR>
+      </TABLE>>];
+      
+      table1:f1 -> table2:f1 
+      table1:f0 -> table2:f0
+      
+      subgraph {
+      rank = same; table1; table2;
+      }
+      
+      labelloc="t";
+      fontname="Courier";
+      label="select(data.frame,a,c)";
+      }
+      ')
+  
+```
+
+```{r}
+yearAndSpecies <- select(larvalAbundanceLong,year,species,genus,larvalAbundanceIndPerm3)
+```
+
+
+If we open up `yearAndSpecies` we'll see that it only contains the year, and the larval abundance for each species. 
+
+Above we used 'normal' grammar, but the strengths of `dplyr` lie in combining several functions using pipes (`%>%`). Since the pipes grammar is unlike anything we've seen in R before, let's repeat what we've done above using pipes.
+
+```{r}
+yearTaxonAbun <- larvalAbundanceLong %>% select(year,species,genus,larvalAbundanceIndPerm3)
+```
+
+To help you understand why we wrote that in that way, let's walk through it step by step. In both cases, the left side of `<-` is `yearTaxonAbun`. First we summon the `larvalAbundanceLong` dataframe and pass it on, using the pipe symbol `%>%`, to the next step, which is the `select()` function. In this case we don't specify which `.data` argument we use in the `select()` function since in gets that from the previous pipe. Essentially, the output of what is written before the pipe becomes the first argument, in this case `.data`, of the function after the pipe. **Fun Fact**: There is a chance you have encountered pipes before in the shell. In R, a pipe symbol is `%>%` while in the shell it is `|` but the concept is the same!
+
+>**Pro-tip**
+>
+> Did you get an error while running the `select()` function? Something like:
+> `Error in (function (classes, fdef, mtable)  : `
+>  `unable to find an inherited method for function ‘select’ for signature ‘"data.frame"’`
+> That's because many packages have a `select()` function; In this case, it's the `raster` package causing problems.
+> It is possible to get around that problem the 'hacky' way by loading `tidyverse` after all the other packages so that the `dplyr` (which is in the `tidyverse`) version of `select` sort of overwrites the one loaded from `raster`.
+>
+> Alternatively, you can designate which package using the `::` (e.g. `package::function()`) when it's not clear. 
+> `yearTaxonAbun <- larvalAbundanceLong %>% dplyr::select(year,species,genus,larvalAbundanceIndPerm3)`
+
+### Using `filter()`
+
+If we now wanted to move forward with the above, but only with species for which we have a valid `genus` and `species`, we can combine `select` and `filter`
+
+```{r}
+yearTaxonAbunValid <- larvalAbundanceLong %>%
+    select(year,species,genus,larvalAbundanceIndPerm3) %>% 
+    filter(genus!="Other") %>% 
+    filter(!is.na(species))
+
+# we can also string the two filter operations into one using the and symbol '&'
+
+yearTaxonAbunValid <- larvalAbundanceLong %>%
+    select(year,species,genus,larvalAbundanceIndPerm3) %>% 
+    filter(genus!="Other" & !is.na(species))
+```
+
+> ** Challenge 1 **
+>
+> Write a single command (which can span multiple lines and includes pipes) that will produce a dataframe that has the values for `larvalAbundanceIndPerm3` for all species at `locationID` 5, but not for other sites. I also want locationID, and lat/long removed from the output. How many rows does your dataframe have and why?
+> [Solution](https://remi-daigle.github.io/2017-CHONe-Data/dataviz.nb.html#challenge_answers)
+
+
+### Using `group_by()`
+
+Now, we were supposed to be reducing the error prone repetitiveness of what can
+be done with base R, but up to now we haven't done that since we would have to
+repeat the above for each species. Instead of `filter()`, which will only pass
+observations that meet your criteria (in the above: `locationID==5`), we
+can use `group_by()`, which will essentially use every unique criteria that you
+could have used in filter.
+
+```{r}
+str(larvalAbundanceLong)
+
+str(larvalAbundanceLong %>% group_by(locationID))
+```
+You will notice that the structure of the dataframe where we used `group_by()`
+(`grouped_df`) is not the same as the original `larvalAbundanceLong` (`data.frame`). A
+`grouped_df` can be thought of as a `list` where each item in the `list`is a
+`data.frame` which contains only the rows that correspond to the a particular
+value `locationID` (at least in the example above).
+
+```{r group_by,results='asis',echo=FALSE, message=FALSE}
+grViz('digraph html {
+      table1 [shape=none, margin=0,label=<
+      <TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1" CELLPADDING="6">
+      <TR>
+      <TD BGCOLOR="#FF0000" CELLPADDING="0">a</TD>
+      <TD BGCOLOR="#FF7400" CELLPADDING="0">b</TD>
+      <TD BGCOLOR="#009999" CELLPADDING="0">c</TD>
+      <TD BGCOLOR="#00CC00" CELLPADDING="0">d</TD>
+      </TR>
+      
+      <TR>
+      <TD BGCOLOR="#FF0000" CELLPADDING="0">1</TD>
+      <TD BGCOLOR="#FF7400"></TD>
+      <TD BGCOLOR="#009999"></TD>
+      <TD PORT="f0" BGCOLOR="#00CC00"></TD>
+      </TR>
+      
+      <TR>
+      <TD BGCOLOR="#FF0000" CELLPADDING="0">1</TD>
+      <TD BGCOLOR="#FF7400"></TD>
+      <TD BGCOLOR="#009999"></TD>
+      <TD BGCOLOR="#00CC00"></TD>
+      </TR>
+      
+      <TR>
+      <TD BGCOLOR="#FF0000" CELLPADDING="0">2</TD>
+      <TD BGCOLOR="#FF7400"></TD>
+      <TD BGCOLOR="#009999"></TD>
+      <TD PORT="f1" BGCOLOR="#00CC00"></TD>
+      </TR>
+      
+      <TR>
+      <TD BGCOLOR="#FF0000" CELLPADDING="0">2</TD>
+      <TD BGCOLOR="#FF7400"></TD>
+      <TD BGCOLOR="#009999"></TD>
+      <TD BGCOLOR="#00CC00"></TD>
+      </TR>
+      
+      <TR>
+      <TD BGCOLOR="#FF0000" CELLPADDING="0">3</TD>
+      <TD BGCOLOR="#FF7400"></TD>
+      <TD BGCOLOR="#009999"></TD>
+      <TD PORT="f2" BGCOLOR="#00CC00"></TD>
+      </TR>
+      
+      <TR>
+      <TD BGCOLOR="#FF0000" CELLPADDING="0">3</TD>
+      <TD BGCOLOR="#FF7400"></TD>
+      <TD BGCOLOR="#009999"></TD>
+      <TD BGCOLOR="#00CC00"></TD>
+      </TR>
+      </TABLE>>];
+      table2 [shape=none, margin=0,label=<
+      <TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1" CELLPADDING="6">
+      <TR>
+      <TD BGCOLOR="#FF0000" CELLPADDING="0">a</TD>
+      <TD BGCOLOR="#FF7400" CELLPADDING="0">b</TD>
+      <TD BGCOLOR="#009999" CELLPADDING="0">c</TD>
+      <TD BGCOLOR="#00CC00" CELLPADDING="0">d</TD>
+      </TR>
+      
+      <TR>
+      <TD PORT="f0" BGCOLOR="#FF0000" CELLPADDING="0">1</TD>
+      <TD BGCOLOR="#FF7400"></TD>
+      <TD BGCOLOR="#009999"></TD>
+      <TD BGCOLOR="#00CC00"></TD>
+      </TR>
+      
+      <TR>
+      <TD BGCOLOR="#FF0000" CELLPADDING="0">1</TD>
+      <TD BGCOLOR="#FF7400"></TD>
+      <TD BGCOLOR="#009999"></TD>
+      <TD BGCOLOR="#00CC00"></TD>
+      </TR>
+      
+      </TABLE>>];
+      table3 [shape=none, margin=0,label=<
+      <TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1" CELLPADDING="6">
+      <TR>
+      <TD BGCOLOR="#FF0000" CELLPADDING="0">a</TD>
+      <TD BGCOLOR="#FF7400" CELLPADDING="0">b</TD>
+      <TD BGCOLOR="#009999" CELLPADDING="0">c</TD>
+      <TD BGCOLOR="#00CC00" CELLPADDING="0">d</TD>
+      </TR>
+      
+      <TR>
+      <TD PORT="f1" BGCOLOR="#FF0000" CELLPADDING="0">2</TD>
+      <TD BGCOLOR="#FF7400"></TD>
+      <TD BGCOLOR="#009999"></TD>
+      <TD BGCOLOR="#00CC00"></TD>
+      </TR>
+      
+      <TR>
+      <TD BGCOLOR="#FF0000" CELLPADDING="0">2</TD>
+      <TD BGCOLOR="#FF7400"></TD>
+      <TD BGCOLOR="#009999"></TD>
+      <TD BGCOLOR="#00CC00"></TD>
+      </TR>
+      </TABLE>>];
+      table4 [shape=none, margin=0,label=<
+      <TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1" CELLPADDING="6">
+      <TR>
+      <TD BGCOLOR="#FF0000" CELLPADDING="0">a</TD>
+      <TD BGCOLOR="#FF7400" CELLPADDING="0">b</TD>
+      <TD BGCOLOR="#009999" CELLPADDING="0">c</TD>
+      <TD BGCOLOR="#00CC00" CELLPADDING="0">d</TD>
+      </TR>
+      
+      <TR>
+      <TD PORT="f2" BGCOLOR="#FF0000" CELLPADDING="0">3</TD>
+      <TD BGCOLOR="#FF7400"></TD>
+      <TD BGCOLOR="#009999"></TD>
+      <TD BGCOLOR="#00CC00"></TD>
+      </TR>
+      
+      <TR>
+      <TD BGCOLOR="#FF0000" CELLPADDING="0">3</TD>
+      <TD BGCOLOR="#FF7400"></TD>
+      <TD BGCOLOR="#009999"></TD>
+      <TD BGCOLOR="#00CC00"></TD>
+      </TR>
+      </TABLE>>];
+      
+      
+      
+      table1:f0 -> table2:f0 
+      table1:f1 -> table3:f1
+      table1:f2 -> table4:f2
+      
+      subgraph {
+      rank = same; table1; table2; table3 ;table4;
+      }
+      subgraph {
+      table2
+      table3
+      table4
+      }
+      
+      labelloc="t";
+      fontname="Courier";
+      label="data.frame %>% group_by(a)";
+      }
+      ')
+
+```
+
+### Using `summarize()`
+
+The above was a bit on the uneventful side because `group_by()` much more
+exciting in conjunction with `summarize()`. This will allow use to create new
+variable(s) by using functions that repeat for each of the locationID-specific
+data frames. That is to say, using the `group_by()` function, we split our
+original dataframe into multiple pieces, then we can run functions
+(e.g. `mean()` or `sd()`) within `summarize()`.
+
+```{r}
+IndPerm3_byLocationID <- larvalAbundanceLong %>%
+    group_by(locationID) %>%
+    summarize(mean_larvalAbundanceIndPerm3 = mean(larvalAbundanceIndPerm3))
+```
+
+```{r summarize,results='asis',echo=FALSE, message=FALSE}
+grViz('digraph html {
+      table1 [shape=none, margin=0,label=<
+      <TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1" CELLPADDING="6">
+      <TR>
+      <TD BGCOLOR="#FF0000" CELLPADDING="0">a</TD>
+      <TD BGCOLOR="#FF7400" CELLPADDING="0">b</TD>
+      <TD BGCOLOR="#009999" CELLPADDING="0">c</TD>
+      <TD BGCOLOR="#00CC00" CELLPADDING="0">d</TD>
+      </TR>
+      
+      <TR>
+      <TD BGCOLOR="#FF0000" CELLPADDING="0">1</TD>
+      <TD BGCOLOR="#FF7400"></TD>
+      <TD BGCOLOR="#009999"></TD>
+      <TD PORT="f0" BGCOLOR="#00CC00"></TD>
+      </TR>
+      
+      <TR>
+      <TD BGCOLOR="#FF0000" CELLPADDING="0">1</TD>
+      <TD BGCOLOR="#FF7400"></TD>
+      <TD BGCOLOR="#009999"></TD>
+      <TD BGCOLOR="#00CC00"></TD>
+      </TR>
+      
+      <TR>
+      <TD BGCOLOR="#FF0000" CELLPADDING="0">2</TD>
+      <TD BGCOLOR="#FF7400"></TD>
+      <TD BGCOLOR="#009999"></TD>
+      <TD PORT="f1" BGCOLOR="#00CC00"></TD>
+      </TR>
+      
+      <TR>
+      <TD BGCOLOR="#FF0000" CELLPADDING="0">2</TD>
+      <TD BGCOLOR="#FF7400"></TD>
+      <TD BGCOLOR="#009999"></TD>
+      <TD BGCOLOR="#00CC00"></TD>
+      </TR>
+      
+      <TR>
+      <TD BGCOLOR="#FF0000" CELLPADDING="0">3</TD>
+      <TD BGCOLOR="#FF7400"></TD>
+      <TD BGCOLOR="#009999"></TD>
+      <TD PORT="f2" BGCOLOR="#00CC00"></TD>
+      </TR>
+      
+      <TR>
+      <TD BGCOLOR="#FF0000" CELLPADDING="0">3</TD>
+      <TD BGCOLOR="#FF7400"></TD>
+      <TD BGCOLOR="#009999"></TD>
+      <TD BGCOLOR="#00CC00"></TD>
+      </TR>
+      </TABLE>>];
+      
+      table2 [shape=none, margin=0,label=<
+      <TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1" CELLPADDING="6">
+      <TR>
+      <TD PORT="f0" BGCOLOR="#FF0000" CELLPADDING="0">a</TD>
+      <TD BGCOLOR="#FF7400" CELLPADDING="0">b</TD>
+      <TD BGCOLOR="#009999" CELLPADDING="0">c</TD>
+      <TD BGCOLOR="#00CC00" CELLPADDING="0">d</TD>
+      </TR>
+      
+      <TR>
+      <TD BGCOLOR="#FF0000" CELLPADDING="0">1</TD>
+      <TD BGCOLOR="#FF7400"></TD>
+      <TD BGCOLOR="#009999"></TD>
+      <TD BGCOLOR="#00CC00"></TD>
+      </TR>
+      
+      <TR>
+      <TD PORT="f3" BGCOLOR="#FF0000" CELLPADDING="0">1</TD>
+      <TD BGCOLOR="#FF7400"></TD>
+      <TD BGCOLOR="#009999"></TD>
+      <TD BGCOLOR="#00CC00"></TD>
+      </TR>
+      
+      </TABLE>>];
+      
+      table3 [shape=none, margin=0,label=<
+      <TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1" CELLPADDING="6">
+      <TR>
+      <TD PORT="f1" BGCOLOR="#FF0000" CELLPADDING="0">a</TD>
+      <TD BGCOLOR="#FF7400" CELLPADDING="0">b</TD>
+      <TD BGCOLOR="#009999" CELLPADDING="0">c</TD>
+      <TD BGCOLOR="#00CC00" CELLPADDING="0">d</TD>
+      </TR>
+      
+      <TR>
+      <TD BGCOLOR="#FF0000" CELLPADDING="0">2</TD>
+      <TD BGCOLOR="#FF7400"></TD>
+      <TD BGCOLOR="#009999"></TD>
+      <TD BGCOLOR="#00CC00"></TD>
+      </TR>
+      
+      <TR>
+      <TD PORT="f3" BGCOLOR="#FF0000" CELLPADDING="0">2</TD>
+      <TD BGCOLOR="#FF7400"></TD>
+      <TD BGCOLOR="#009999"></TD>
+      <TD BGCOLOR="#00CC00"></TD>
+      </TR>
+      </TABLE>>];
+      
+      table4 [shape=none, margin=0,label=<
+      <TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1" CELLPADDING="6">
+      <TR>
+      <TD PORT="f2" BGCOLOR="#FF0000" CELLPADDING="0">a</TD>
+      <TD BGCOLOR="#FF7400" CELLPADDING="0">b</TD>
+      <TD BGCOLOR="#009999" CELLPADDING="0">c</TD>
+      <TD BGCOLOR="#00CC00" CELLPADDING="0">d</TD>
+      </TR>
+      
+      <TR>
+      <TD BGCOLOR="#FF0000" CELLPADDING="0">3</TD>
+      <TD BGCOLOR="#FF7400"></TD>
+      <TD BGCOLOR="#009999"></TD>
+      <TD BGCOLOR="#00CC00"></TD>
+      </TR>
+      
+      <TR>
+      <TD PORT="f3" BGCOLOR="#FF0000" CELLPADDING="0">3</TD>
+      <TD BGCOLOR="#FF7400"></TD>
+      <TD BGCOLOR="#009999"></TD>
+      <TD BGCOLOR="#00CC00"></TD>
+      </TR>
+      </TABLE>>];
+      
+      table5 [shape=none, margin=0,label=<
+      <TABLE BORDER="0" CELLBORDER="0" CELLSPACING="1" CELLPADDING="6">
+      <TR>
+      <TD BGCOLOR="#FF0000" CELLPADDING="0">a</TD>
+      <TD BGCOLOR="#FF7400" CELLPADDING="0">mean_b</TD>
+      </TR>
+      
+      <TR>
+      <TD PORT="f0" BGCOLOR="#FF0000" CELLPADDING="0">1</TD>
+      <TD BGCOLOR="#FF7400"></TD>
+      </TR>
+      
+      <TR>
+      <TD PORT="f1" BGCOLOR="#FF0000" CELLPADDING="0">2</TD>
+      <TD BGCOLOR="#FF7400"></TD>
+      </TR>
+      
+      <TR>
+      <TD PORT="f2" BGCOLOR="#FF0000" CELLPADDING="0">3</TD>
+      <TD BGCOLOR="#FF7400"></TD>
+      </TR>
+      
+      </TABLE>>];
+      
+      
+      table1:f0 -> table2:f0 
+      table1:f1 -> table3:f1
+      table1:f2 -> table4:f2
+      table2:f3 -> table5:f0 
+      table3:f3 -> table5:f1
+      table4:f3 -> table5:f2
+      subgraph {
+      rank = same; table1; table2; table3 ; table4;
+      }
+      subgraph {
+      table2
+      table3
+      table4
+      }
+      
+      labelloc="t";
+      fontname="Courier";
+      label="data.frame %>%\\l\tgroup_by(a) %>%\\l\tsummarize(mean_b=mean(b))\\l";
+      }
+      ')
+```
+
+That allowed us to calculate the mean larval abundance for each location, but it gets
+so much better!
+
+> ** Challenge 2 **
+>
+> Calculate the mean larval abundance per locationID. Which has the highest mean larval abundance and which has the lowest mean larval abundance?
+> [Solution](https://remi-daigle.github.io/2017-CHONe-Data/dataviz.nb.html#challenge_answers)
+
+
+The function `group_by()` allows us to group by multiple variables. Let's group by `locationID` and `scientificName`.
+
+
+```{r}
+IndPerm3_byLocationID_bySpp <- larvalAbundanceLong %>%
+    group_by(locationID,scientificName ) %>%
+    summarize(mean_larvalAbundanceIndPerm3 = mean(larvalAbundanceIndPerm3))
+```
+
+That is already quite powerful, but it gets even better! You're not limited to defining 1 new variable in `summarize()`.
+
+```{r}
+IndPerm3_byLocationID_bySpp <- larvalAbundanceLong %>%
+    group_by(locationID,scientificName ) %>%
+    summarize(mean_larvalAbundanceIndPerm3 = mean(larvalAbundanceIndPerm3),
+              sd_larvalAbundanceIndPerm3 = sd(larvalAbundanceIndPerm3),
+              mean_depth = mean(depth),
+              sd_depth= sd(depth))
+```
+
+### Using `mutate()`
+
+We can also create new variables prior to (or even after) summarizing information using `mutate()`.
+
+```{r}
+IndPerm3_byLocationID_bySpp <- larvalAbundanceLong %>%
+    mutate(larvalAbundanceIndPercm3=larvalAbundanceIndPerm3*1000000) %>% 
+    group_by(locationID,scientificName ) %>%
+    summarize(mean_larvalAbundanceIndPercm3 = mean(larvalAbundanceIndPercm3),
+              sd_larvalAbundanceIndPercm3 = sd(larvalAbundanceIndPercm3),
+              mean_depth = mean(depth),
+              sd_depth= sd(depth))
+```
 
 ## The `ggplot2` package
 
@@ -27,14 +780,6 @@ output:
 
 ### The `sf` package
 
-```{r,load packages,message=FALSE}
-library(tidyverse)
-library(sf)
-library(robis)
-library(marmap)
-library(raster)
-# library()
-```
 
 ##Plot your study site
 ### Define site map limits
@@ -167,5 +912,24 @@ ggplot(OBIS) +
 
 # Important links
 A [GIS tutorial](http://remi-daigle.github.io/GIS_mapping_in_R/) written by Remi (mostly in `sp`)
+
+# Challenge answers
+> **Challenge 1 solution **
+>```{r,eval=FALSE}
+>site5 <- larvalAbundanceLong %>%
+>    filter(locationID==5) %>%
+>    select(-locationID,-decimalLatitude,-decimalLatitude)
+>```
+>**Note:** The order of operations is very important in this case. If we used 'select' first, filter would not be able to find the variable continent since we would have removed it in the previous step.
+
+
+> **Challenge 2 solution **
+>```{r}
+>IndPerm3_byLocationID <- larvalAbundanceLong %>%
+>    group_by(locationID) %>%
+>    summarize(mean_IndPerm3 = mean(larvalAbundanceIndPerm3)) %>% 
+>    filter(mean_IndPerm3 == min(mean_IndPerm3) | mean_IndPerm3 == max(mean_IndPerm3))
+>```
+
 
 [<<BACK](https://remi-daigle.github.io/2017-CHONe-Data/)
