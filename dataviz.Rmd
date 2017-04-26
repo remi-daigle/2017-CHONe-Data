@@ -35,6 +35,7 @@ library(sf)
 library(raster)
 library(marmap)
 library(robis)
+library(gridExtra)
 library(tidyverse)
 
 larvalAbundance <- read.csv("data/larvalAbundanceClean.csv", stringsAsFactors = FALSE)
@@ -886,7 +887,11 @@ Let's add a bit more to these maps with some proper mapping tools. But before we
 
 # Mapping
 
-You can always plot any spatial data and use latitude and longitude as normal Cartesian coordinates as we did above, but if you want to do anything with projections, or other GIS type operations (buffer, intersection, overlaps, etc), you really need to dig a little deeper
+You can always plot any spatial data and use latitude and longitude as normal Cartesian coordinates as we did above, but if you want to do anything with projections, or other GIS type operations (buffer, intersection, overlaps, etc), you really need to dig a little deeper. 
+
+Projection and datum information in R in both `sp` and `sf` (as well as many other applications) are handled by the [proj.4](http://proj4.org/index.html) standard. We won't go in to deep into the 'how to choose a projection', but there is substantial information regarding the parameters on the [proj.4](http://proj4.org/index.html) website and this [Projection Wizard](http://projectionwizard.org/) is super helpful for recommending projection (and producing formatted proj4 strings) based on the extent of your map and what you want to optimize for (i.e. Equal-area, Conformal, Equidistant, Compromise).
+
+Be aware that in most cases R will throw an error if you are trying to use multiple spatial objects with different transformations, so remember to transform them to a common projection before trying to combine them. Also, remember that some projections have units of latitude and longitude and some have units of meters and they are of course incompatible.
 
 ## The classic and the cutting edge: `sp` vs `sf`
 
@@ -894,142 +899,154 @@ Before November 2016, if you wanted to do any spatial tasks in R your choice was
 
 ### The `sp` package
 
+The bread and butter 'Spatial' object class from the `sp`package are of the form `SpatialBLANKDataFrame` where blank can be `Points`, `Lines`, `Polygons`, etc. Let's create a `SpatialPointsDataFrame` from our `larvalAbundanceLong`
 
+```{r}
+# first make spatial points and set the projection (more on that below)
+spoints <- SpatialPoints(coords = larvalAbundanceLong[,c("decimalLongitude","decimalLatitude")],
+                         proj4string = CRS("+proj=longlat +datum=WGS84"))
+
+# then make a SpatialPointsDataFrame by addint the data frame back in
+spointsdf <- SpatialPointsDataFrame(spoints,larvalAbundanceLong)
+
+# now for each point in spointsdf there is a row in the data frame which can be accessed by spointsdf@data, or if you want a particular variable spointsdf$year (or spointsdf@data$year), but the data and the geometries are a little disjoint.
+
+# plot it
+plot(spointsdf)
+```
+
+That's not particularly useful without a basemap, so let's use the `raster` package to get some high resolution province level boundaries data (not the only way to get coastlines, but one of my favorite).
+
+```{r}
+Canada <- getData('GADM', country="CAN", level=1)
+plot(Canada)
+
+# this is a little excessive since we only need Nova Scotia
+
+NS <- Canada[Canada$NAME_1=="Nova Scotia",]
+plot(NS,add=T,col='blue')
+```
+
+Now let's combine my data with the coastline
+```{r}
+# see the bounding box of the larval data
+bbox(spointsdf)
+
+# transform both Spatial objects
+proj_aea <- "+proj=aea +lat_1=45.34229371956944 +lat_2=46.154426884765485 +lon_0=-61.70471191406251"
+spointsdf_aea <- spTransform(spointsdf,proj_aea)
+NS_aea <- spTransform(NS,proj_aea)
+
+# see the bounding box of the larval data after projection
+bbox(spointsdf_aea)
+
+plot(spointsdf_aea,pch=16, xlim = c(-15000,12000), ylim = c(4705000,4755000))
+plot(NS_aea, col = 'grey',add=T)
+```
+
+You can find more info about the other Spatial classes in my [GIS tutorial](http://remi-daigle.github.io/GIS_mapping_in_R/) I wrote before `sf` was created.
 
 ### The `sf` package
 
+The `sf` package is an an R implementation of "Simple Features" (officially Simple Feature Access) which is both an Open Geospatial Consortium (OGC) and International Organization for Standardization (ISO) standard ISO 19125 that specifies a common storage and access model of mostly two-dimensional geometries (point, line, polygon, multi-point, multi-line, etc.) used by geographic information systems.
 
-##Plot your study site
-### Define site map limits
-Let's start by defining a bounding box for your study site:
+The bread and butter object classes in the `sf` package are `sf` (created by `st_sf()`) which are effectively a normal data frame with the addition of one (or more) simple features list column (`sfc`; created by `st_sfc()`). This `sfc` column, which is really just another column in your data frame, contains the geometric information that gets plotted on a map. This geometric information is stored as a simple feature which can take the form of polygon(s) (created by `st_polygon()` or `st_multipolygon()` ), line(s) (created by `st_st_linestring()` or `st_multist_linestring()` ), or point(s) (created by `st_point()` or `st_multipoint()` )
 
-```{r, bounding box}
-#define the corners
-latmax <- 46.25
-latmin <- 45.5
-lonmax <- -61.25
-lonmin <- -62.25
-
-#create a matrix
-bbmat <- cbind(
-            c(lonmin,lonmax,lonmax,lonmin,lonmin),
-            c(latmin,latmin,latmax,latmax,latmin)
-        )
-# make the matrix a 'simple features' polygon
-bbsf <- st_polygon(list(bbmat))
-# and let's give it information about the projection:
-bbsfc <- st_sfc(bbsf,crs="+proj=longlat +datum=WGS84")
-# finally, let's make it a simple features data.frame
-bb <- st_sf(name="Study Site",geometry=bbsfc)
-str(bb)
-
-# plot it!
-ggplot(bb)+
-    geom_sf()
-```
-
-Riveting! 
-
-### Add a basemap!
-
-There are many ways to add a basemap in R
-
-## marmap package
-
-```{r,marmap}
-bathymetry <- getNOAA.bathy(lonmin,lonmax,latmin,latmax,resolution=1,keep=TRUE)
-plot.bathy(bathymetry,image=T,drawlabels=TRUE)
-
-blues <- colorRampPalette(c("darkblue", "lightblue1"))
-greys <- colorRampPalette(c(grey(0.4),grey(0.99)))
-
-plot.bathy(bathymetry,
-           image = TRUE,
-           land = TRUE,
-           n=0,
-           bpal = list(c(0, max(bathymetry), greys(100)),
-                       c(min(bathymetry), 0, blues(100))))
-
-# this is a 'bathy' object and you could plot it as is with the tools provided in marmap, but to keep things 'simple' I'm going to convert to sf. There is no direct method yet, so... don't judge me!
-# convert from bathy to raster to 'sp' polygon to simple features
-# bathypoly <- marmap::as.raster(bathymetry) %>% 
-    # rasterToPolygons() %>% st_as_sf
-bathyras <- fortify.bathy(bathymetry)
-
-bathyras$z[bathyras$z>0] <- NA
-
-ggplot() +
-    geom_raster(data=bathyras,aes(x=x,y=y,fill=z))+
-    geom_sf(data=bb,fill="transparent",colour='black')
-```
-
+Let's start by turning our `larvalAbundanceLong` into an `sf` object and transform it into our desired projection in 1 command (reminder: `sf` is compatible with the tidyverse):
 
 ```{r}
-Canada <- getData('GADM', country="CAN", level=1) %>% 
+larvalAbundanceLong_sf <- larvalAbundanceLong %>% 
+    st_as_sf(coords = c("decimalLongitude", "decimalLatitude"),
+             crs="+proj=longlat +datum=WGS84",
+             remove=FALSE) %>% 
+    st_transform(proj_aea)
+
+ggplot()+
+    geom_sf(data = larvalAbundanceLong_sf)
+```
+As you may have noticed, `geom_sf` does not *need* a defined `aes()` since is already knows that latitude is your y-axis and longitude is the x-axis. You can of course toggle `group`, `colour`, `size`, and `fill` in the `aes` based on other columns in your data frame.
+
+Let's plot is with a basemap! `raster` only provides the GADM coastline data in `sp` format, but we can convert with `st_as_sf()` and then `filter()` to get just the Maritime provinces with `dplyr`
+```{r}
+MarProv_sf <- getData('GADM', country="CAN", level=1) %>% 
     st_as_sf() %>% 
     filter(NAME_1=="Nova Scotia"|
                NAME_1=="Prince Edward Island"|
-               NAME_1=="New Brunswick")
-ggplot() +
-    geom_sf(data=Canada,aes(fill=NAME_1))
+               NAME_1=="New Brunswick")%>% 
+    st_transform(proj_aea)
 
-x=0.2
-ggplot() +
-    geom_raster(data=bathyras,aes(x=x,y=y,fill=z))+
-    geom_sf(data=bb,fill="transparent",colour='yellow',size=2)+
-    geom_sf(data=Canada,fill='grey40')+
-    coord_sf(xlim = c(lonmin-x,lonmax+x),
-             ylim = c(latmin-x,latmax+x),
-             expand = F) 
+ggplot()+
+    geom_sf(data = larvalAbundanceLong_sf)+
+    geom_sf(data = MarProv_sf)
 
 ```
 
+And to make things fun, let's have one zoomed in plot with the dots, and a zoomed out plot with a 'zoom box'
+```{r, bounding box}
+#define the corners (with a buffer)
+larvalbbox <- st_buffer(larvalAbundanceLong_sf, dist = 10000) %>% 
+    st_bbox()
 
-## Get data from OBIS
- 
-OBIS is the [Ocean Biogeographic Information System](http://www.iobis.org/) and their vision is: "To be the most comprehensive gateway to the world’s ocean biodiversity and biogeographic data and information required to address pressing coastal and world ocean concerns."
- 
- We can get access to their HUGE database through the excellent `robis` package by [ropensci](https://ropensci.org/) (unsurprisingly, they also have other great open science R packages)
- 
- 
-```{r,eval=FALSE}
-st_as_text(bb$geometry)
-OBIS <- occurrence(geometry=st_as_text(bb$geometry))
-write.csv(OBIS,'obis.csv',row.names = FALSE)
+#create a matrix that traces a line the whole way around your box
+bbsfc <- cbind(
+            c(larvalbbox[1],larvalbbox[3],larvalbbox[3],larvalbbox[1],larvalbbox[1]),
+            c(larvalbbox[2],larvalbbox[2],larvalbbox[4],larvalbbox[4],larvalbbox[2])
+        ) %>% 
+    list() %>%                  # put that matrix in a list
+    st_polygon() %>%            # put that list in a simple features polygon
+    st_sfc(crs = proj_aea) %>%  # put that polygon into a simple features column and give projection info
+    st_sf(name="Study Site", geometry=.)    # finally make it an sf object
+
+# plot it!
+p1 <- ggplot()+
+    geom_sf(data = MarProv_sf)+
+    geom_sf(data = bbsfc, size = 2, fill = "transparent")
+
+p2 <- ggplot()+
+    geom_sf(data = larvalAbundanceLong_sf)+
+    geom_sf(data = MarProv_sf) +
+    coord_sf(xlim = larvalbbox[c(1,3)],ylim = larvalbbox[c(2,4)])
+
+grid.arrange(p1,p2)
 ```
+
+
+Finally, let's bring facets back!
 
 ```{r}
-OBIS <- read.csv("obis.csv")
-OBIS <- st_as_sf(OBIS,
-                 coords = c("decimalLongitude", "decimalLatitude"),
-                 crs="+proj=longlat +datum=WGS84",
-                 remove=FALSE) %>% 
-    filter(!is.na(species))
+# prepare long data for plotting
+larvalAbundanceLongPlot <- larvalAbundanceLong_sf %>% 
+    group_by(scientificName,decimalLongitude,decimalLatitude) %>% 
+    summarize(mean_IndPerm3 = mean(larvalAbundanceIndPerm3)) %>% 
+    ungroup() %>% 
+    mutate(lat_aea = unlist(lapply(geometry,'[',2)),
+           long_aea = unlist(lapply(geometry,'[',1)))
 
-ggplot() +
-    geom_raster(data=bathyras,aes(x=x,y=y,fill=z))+
-    geom_sf(data=bb,fill="transparent",colour='yellow',size=2)+
-    geom_sf(data=Canada,fill='grey40')+
-    geom_point(data=OBIS,aes(colour=phylum,x=decimalLongitude,y=decimalLatitude,size=2))+
-    coord_sf(xlim = c(lonmin-x,lonmax+x),
-             ylim = c(latmin-x,latmax+x),
-             expand = F)
+
+p3 <- ggplot()+
+    geom_point(data = larvalAbundanceLongPlot, aes(y = lat_aea, x = long_aea, size=mean_IndPerm3))+
+    geom_sf(data = MarProv_sf) +
+    facet_wrap(~scientificName)+
+    coord_sf(xlim = larvalbbox[c(1,3)],ylim = larvalbbox[c(2,4)]) 
+p3
+```
+```{r, eval = FALSE}
+# oh, and if you want to save a plot, pick your format, size, and resolution
+ggsave(filename="speciesabundance.tiff", plot = p3, width = 20, height = 16.5, unit = "cm", dpi = 300)
+ggsave(filename="speciesabundance.pdf", plot = p3, width = 20, height = 16.5, unit = "cm", dpi = 300)
+ggsave(filename="speciesabundance.png", plot = p3, width = 20, height = 16.5, unit = "cm", dpi = 300)
+
+
 ```
 
-```{r}
-ggplot(OBIS) +
-    geom_raster(data=bathyras,aes(x=x,y=y,fill=z))+
-    geom_sf(data=bb,fill="transparent",colour='yellow',size=2)+
-    geom_sf(data=Canada,fill='grey40')+
-    geom_point(data=OBIS,aes(x=decimalLongitude,y=decimalLatitude))+
-    facet_wrap(~phylum)+
-    coord_sf(xlim = c(lonmin-x,lonmax+x),
-             ylim = c(latmin-x,latmax+x),
-             expand = F)
-```
 
 # Important links
+
+[R for Data Science](http://r4ds.had.co.nz/)
+[R Graph Catalog](http://shiny.stat.ubc.ca/r-graph-catalog/)
 A [GIS tutorial](http://remi-daigle.github.io/GIS_mapping_in_R/) written by Remi (mostly in `sp`)
+Projection stuff: [proj.4](http://proj4.org/index.html) and [Projection Wizard](http://projectionwizard.org/)
+
 
 # Challenge answers
 > **Challenge 1 solution **
