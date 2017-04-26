@@ -778,7 +778,7 @@ R comes with basic plotting function, usually referred to as 'base plot', e.g:
 plot(larvalAbundance$Margarites.spp.,larvalAbundance$Diaphana.minuta)
 ```
 
-However, general concensus seems to be that `ggplot2` (part of the tidyverse) is the way to go for plotting. I (Remi) have mixed feelings about this package (my age is showing again). It does make making quick plots easier and is compatible with the rest of the tidyverse, but until recently, `ggplot2` really struggled with any spatial plotting (see '[The classic and the cutting edge: `sp` vs `sf`](https://remi-daigle.github.io/2017-CHONe-Data/dataviz.nb.html#The_classic_and_the_cutting_edge_sp_vs_sf)') so I had to know the base plot anyway. I still think base plot is more customizeable, but it may also be that I have not sufficiently mastered the ggplot world. We're mostly going to cover `ggplot2`, but be aware that there are other plotting paradigms in R (e.g. base, lattice, etc)
+However, general concensus seems to be that `ggplot2` (part of the tidyverse) is the way to go for plotting. I (Remi) have mixed feelings about this package (my age is showing again). It does make making quick plots easier and is compatible with the rest of the tidyverse, but until recently, `ggplot2` really struggled with any spatial plotting (see '[The classic and the cutting edge: `sp` vs `sf`](https://remi-daigle.github.io/2017-CHONe-Data/dataviz.nb.html#the_classic_and_the_cutting_edge:_sp_vs_sf)') so I had to know the base plot anyway. I still think base plot is more customizeable, but it may also be that I have not sufficiently mastered the ggplot world. We're mostly going to cover `ggplot2`, but be aware that there are other plotting paradigms in R (e.g. base, lattice, etc)
 
 ## The `ggplot2` package
 
