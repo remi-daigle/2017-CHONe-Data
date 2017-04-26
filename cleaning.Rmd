@@ -493,6 +493,8 @@ devtools::install_github("iobis/robis")
 # So, we need the github version of ggplot2 as well!
 devtools::install_github("tidyverse/ggplot2")
 
+install.packages('gridExtra') # to be able to arrange multiple ggplot plots
+
 # to gain access to the functions in a package, you can use library(), eg:
 library(tidyverse)
 ```
