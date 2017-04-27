@@ -36,11 +36,11 @@ Participants must bring a laptop with a Mac, Linux, or Windows operating system 
 ## Agenda:
 | May 1 | *Four Points Gatineau, Renaissance B, 4th Floor*  |
 |--------|-------------------------------------------------------------------------|
-|6 - 9 PM  | - [Introduction to Data Workshop](https://remi-daigle.github.io/2017-CHONe-Data/introduction.nb.html) (why?, open access, Angela. <br> - [Metadata](https://remi-daigle.github.io/2017-CHONe-Data/metadata.nb.html) (what is it, standards, Gis, DCT... ) Angela. <br> - [Data organization with spreadsheets](https://remi-daigle.github.io/2017-CHONe-Data/organization.nb.html) (don’t save as excel file, don’t put spaces in columns, square data frame, standard vocab for column headers, Dates). (Remi) <br> - [Data cleaning and raw data management](https://remi-daigle.github.io/2017-CHONe-Data/cleaning.nb.html) (openrefine and other tools, replicable workflow) (Remi/David)  |
+|6 - 9 PM  | - [Introduction to Data Workshop](https://remi-daigle.github.io/2017-CHONe-Data/introduction.nb.html) <br> - [Metadata](https://remi-daigle.github.io/2017-CHONe-Data/metadata.nb.html)  <br> - [Data organization with spreadsheets](https://remi-daigle.github.io/2017-CHONe-Data/organization.nb.html) <br> - [Data cleaning and raw data management](https://remi-daigle.github.io/2017-CHONe-Data/cleaning.nb.html) |
  
 | May 2 | *Four Points Gatineau, Renaissance B, 4th Floor*  |
 |--------|-------------------------------------------------------------------------|
-|8:30 AM - Noon | - [Shock and awe with R](https://remi-daigle.github.io/2017-CHONe-Data/shocknawe.nb.html) (Remi/David) <br> - [Text analysis](https://remi-daigle.github.io/2017-CHONe-Data/text.nb.html)   (David/Remi) <br> - [Data Analysis and Visualization in R](https://remi-daigle.github.io/2017-CHONe-Data/dataviz.nb.html) (basic dplyr, tidyverse, spatial mapping with (http://remi-daigle.github.io/GIS_mapping_in_R/) (Remi/David)|
+|8:30 AM - Noon | - [R Markdown and notebooks](https://remi-daigle.github.io/2017-CHONe-Data/Rmarkdown.nb.html) <br> - [Shock and awe with R](https://remi-daigle.github.io/2017-CHONe-Data/shocknawe.nb.html) <br> - [Text analysis](https://remi-daigle.github.io/2017-CHONe-Data/text.nb.html) <br> - [Data Analysis and Visualization in R](https://remi-daigle.github.io/2017-CHONe-Data/dataviz.nb.html) |
 |Noon - 1 PM | - Lunch |
-| 1 - 5 | - [Data Archiving & version control](https://remi-daigle.github.io/2017-CHONe-Data/versioncontrol.nb.html) ( Angela: review of data repositories (zenodo, figshare, dryad, OBIS, Remi/David: version control, student builder pack, Github) |
-| evening | - Hacky Hour (everyone) |
+| 1 - 5 | - [Data Archiving & Version Control](https://remi-daigle.github.io/2017-CHONe-Data/versioncontrol.nb.html) |
+| evening | - Hacky Hour (location TBD) |
