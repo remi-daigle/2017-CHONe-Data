@@ -16,7 +16,7 @@ My unofficial mantra (again):
 
 !["Adam Savage via Pintrest"](https://s-media-cache-ak0.pinimg.com/564x/e9/f2/19/e9f219dce30f13670158832310b0e42c.jpg)
 
-In  [Data organization with spreadsheets](https://remi-daigle.github.io/2017-CHONe-Data/organization.nb.html) we learned how to write down our data, avoid common errors, and how to save your data so that you and others can read and understand it later. 
+In  [Data organization with spreadsheets](https://remi-daigle.github.io/2017-CHONe-Data/organization.nb.html) we learned how to write down our data, avoid common errors, and how to save your data so that you and others can read and understand it later.
 
 Now let's learn how to write down **ALL** the steps needed to take you from your raw data to publication quality figures. That's the key to reproducibility, if every step is written down, then others can reproduce your findings! Below, You will learn how to clean your data in a reproducible way using OpenRefine and R.
 
@@ -41,7 +41,7 @@ By now I've probably said the words reproducible and reproducibility so often th
     - you can easily re-run your analysis after 'reviewer 3' makes you add one data point
     - you will be able to easily adapt your method
     - you will receive higher citations since someone may cite you for your methods/data
-    - you will appear like an honest/better scientist 
+    - you will appear like an honest/better scientist
 - **other scientists** since:
     - they will be able to reuse/adapt your methods/data
     - they will be better able to judge your methods as appropriate (for your data during review, or their data in the future)
@@ -49,8 +49,8 @@ By now I've probably said the words reproducible and reproducibility so often th
     - discoveries are published more efficiently
     - findings are 'correct' more often
     - there is increased trust in 'Science', which we badly need right now
-    
-    
+
+
 # OpenRefine
 
 OpenRefine (formerly Google Refine) is a powerful tool for working with messy data: cleaning it; transforming it from one format into another. It's effectively a reproducible way to work in a spreadsheet, no coding is required on your part since it generates a script that details what you did to the data, step by step.
@@ -63,11 +63,11 @@ The first step is to load your data and to create a project. If you haven't done
 In OpenRefine, click `Choose Files` and find the `larval abundance.csv` which is in the `rawdata` directory of the project folder. Then click on the `Create Project` button (you may want to rename the project).
 
 ## Data Cleaning
-You are now working on a copy of the raw data and changes you make in OpenRefine will not 'break' your original raw data. In here you can do all the regular 'spreadsheet-y' things. You can edit specific cells, sort, undo/redo, view subsets of your data (facet), etc. But the more powerful functions of OpenRefine are: 
+You are now working on a copy of the raw data and changes you make in OpenRefine will not 'break' your original raw data. In here you can do all the regular 'spreadsheet-y' things. You can edit specific cells, sort, undo/redo, view subsets of your data (facet), etc. But the more powerful functions of OpenRefine are:
 
-- **Cluster** (click on column header arrow, then `Edit cells > Cluster and Edit...`) which means “finding groups of different values that might be alternative representations of the same thing”. For example, the two strings “New York” and “new york” are very likely to refer to the same concept and just have capitalization differences. 
+- **Cluster** (click on column header arrow, then `Edit cells > Cluster and Edit...`) which means “finding groups of different values that might be alternative representations of the same thing”. For example, the two strings “New York” and “new york” are very likely to refer to the same concept and just have capitalization differences.
 
-- **Whitespace management** (click on column header arrow, then `Edit cells > Common transforms > Trim leading and trailing whitespace.` and `Edit cells > Common transforms > Collapse consecutive whitespace.`) Strings with spaces at the beginning or end are particularly hard for we humans to tell from strings without, but the blank characters will make a difference to the computer. We usually want to remove these. 
+- **Whitespace management** (click on column header arrow, then `Edit cells > Common transforms > Trim leading and trailing whitespace.` and `Edit cells > Common transforms > Collapse consecutive whitespace.`) Strings with spaces at the beginning or end are particularly hard for we humans to tell from strings without, but the blank characters will make a difference to the computer. We usually want to remove these.
 
 ![](pictures/ORwhitespace.png)
 
@@ -190,7 +190,7 @@ To create a new script, your can click on the little paper with the plus symbol 
 These scripts are designed to read by R from top to bottom when you hit the ![](pictures/source.png) button, or `Ctrl`+`Shift`+`S` (Windows), or `Command`+`Shift`+`S` (Mac). Alternatively, you can run portions of your code with `Ctrl`+`Enter` (Windows), or `Command`+`Enter` (Mac) and either putting your cursor on a line to run the entire line, or highlighting a subsection of code to run just that portion. This will allow us to build multi-step data processing and analysis scripts.
 
 >**Pro-tip**
->If you don't want R to read something, us the `#`. Anything that is preceded by a `#` is regarded as a 'comment' by R and it does not try to execute those lines (i.e. R ignores anything after a `#`). 
+>If you don't want R to read something, us the `#`. Anything that is preceded by a `#` is regarded as a 'comment' by R and it does not try to execute those lines (i.e. R ignores anything after a `#`).
 > This is also useful if you want to avoid running a few lines of code when you are developing your script. Instead of typing a `#` in front of each line of code, you can highlight the lines you want commented out and hit `Ctrl`+`Shift`+`C` (Windows), or `Command`+`Shift`+`C` (Mac). Magic!
 
 Commenting is super useful to include human readable instructions/documentation in your code. Let's give this a try, write this chunk of code into your script, then run it line by line.
@@ -363,7 +363,7 @@ If I wanted to make a correction manually, we can use indexing:
 # say for example, I knew that the second observation was in fact taken at 12 m depth
 larvalAbundance$depth[2]
 
-# the value in the data frame is indeed 3 WRONG! Let,s correct it 
+# the value in the data frame is indeed 3 WRONG! Let,s correct it
 larvalAbundance$depth[2] <- 12
 head(larvalAbundance)
 
@@ -494,6 +494,14 @@ devtools::install_github("iobis/robis")
 devtools::install_github("tidyverse/ggplot2")
 
 install.packages('gridExtra') # to be able to arrange multiple ggplot plots
+
+install.packages('taxize') # To extract and validate species taxonomy
+
+install.packages('rfishbase') # To access resources available on Fishbase and SeaLifeBase
+
+install.packages('rglobi') # To access interactions data
+
+devtools::install_github("ropensci/rnoaa") # To access environmental data from the NOAA databases
 
 # to gain access to the functions in a package, you can use library(), eg:
 library(tidyverse)
