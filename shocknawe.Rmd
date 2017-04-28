@@ -48,6 +48,9 @@ Now that we have a pretty thorough description of the species, what else could w
 How about fisheries activity?
 install.package('rfisheries') -->
 
+<!--
+setwd('/Users/davidbeauchesne/dropbox/phd/misc/2017-chone-data/2017-chone-data/')
+-->
 
 ```{r, message=FALSE}
 library(sf)
@@ -73,45 +76,90 @@ Let's imagine that you are interested in a species in a given area and wish to k
     latmin <- 45.52399
     lonmax <- -55.73636
     lonmin <- -71.06333
+    #
+    # latmax <- 46.25
+    # latmin <- 45.5
+    # lonmax <- -61.25
+    # lonmin <- -62.25
 ```
 
 ## Describe your species
 
-### Fishbase
+### Fishbase <!-- and Reol? -->
 
-We'll start with a description of the species. First, let's see what [fishbase](http://www.fishbase.ca/) has to offer.
+We'll start with a description of the species. First, let's see what [fishbase](http://www.fishbase.ca/) has to offer. This online data repository, along with [sealifebase](http://www.sealifebase.org/), contains a lot of information on marine and aquatic species all over the world and is accessible through the `package [rfishbase](https://github.com/ropensci/rfishbase)`
 
-```{r, ecology}
-    # install.packages('rfishbase')
-    descr <- rfishbase::species(sp)
+<!-- Reol, install.packages('reol') -->
+
+```{r, ecology, eval = FALSE}
+    # Let's have a look at the information available our species ecology
     ecol <- rfishbase::ecology(sp)
     ecol <- cbind(colnames(ecol), t(ecol))
     rownames(ecol) <- NULL
 
-    kable(ecol, col.names = c('Descriptors', 'Attributes'))
+    knitr::kable(ecol, col.names = c('Descriptors', 'Attributes'))
 ```
 
 ### Taxize
 
-We can also get it's taxonomy rather easily.
+We can also get it's taxonomy rather easily. The package [taxize](https://ropensci.org/tutorials/taxize_tutorial.html) allows you to extract and validate, among other things, the taxonomy of millions of species by accessing an important number of online databases accessible through their Application program interface (API).
+
+- Encyclopedia of Life (EOL) eol
+- axonomic Name Resolution Service tnrs
+- Integrated Taxonomic Information Service (ITIS) itis
+- Global Names Resolver (from EOL/GBIF) gnr
+- Global Names Index (from EOL/GBIF)
+- IUCN Red List
+- Tropicos (from Missouri Botanical Garden)
+- Theplantlist.org
+- Catalogue of Life
+- National Center for Biotechnology Information
+- CANADENSYS Vascan name search API
+- International Plant Names Index (IPNI)
+- World Register of Marine Species (WoRMS)
+- Barcode of Life Data Systems (BOLD)
+- Pan-European Species directories Infrastructure (PESI)
+- Mycobank
+- National Biodiversity Network (UK)
+- Index Fungorum
+- EU BON
+- Index of Names (ION)
+- Open Tree of Life (TOL)
+- World Register of Marine Species (WoRMS)
+- NatureServe
 
 ```{r, taxonomy}
-    # install.packages('taxize')
-    taxo <- taxize::classification(sp, db = 'worms', verbose = FALSE)
-    kable(taxo[[1]])
+    # Start by exporting the taxonomy of our species
+        taxo <- taxize::classification(sp, db = 'worms', verbose = FALSE)
+        taxo[[1]]
+
+    # We can also extract the common or scientific names using sci2comm() & comm2sci(), respectively.
+        taxize::sci2comm(sp, db = 'itis')
+
+    # Or find out whether there are other names under which the species is known
+        taxize::synonyms(sp, db = 'itis')
+
+    # Another really interesting feature is to extract all known species at a given taxonomic scale.
+    # Let's take the genus level and see the first 20 species that are part of that genus on the itis database
+        taxize::children(strsplit(sp, ' ')[[1]][1], db = 'itis')[[1]]
 ```
 
 ### GloBI
 
-How about extracting all known preys and predators of the species of interest?
+How about extracting all known preys and predators of the species of interest? The [Global Biotic Interactions](http://globalbioticinteractions.org) web platform contains thousands of empirical binary interactions for multiple types of interactions, all over the world, and is easily accessible using the package [rglobi](https://github.com/ropensci/rglobi).
 
-```{r, trophic}
-    # install.packages('rglobi')
-    prey <- rglobi::get_prey_of(sp)$target_taxon_name
-    pred <- rglobi::get_predators_of(sp)$target_taxon_name
-    prey
-    pred
+```{r, trophic, eval = FALSE}
+    # There are multiple types of interactions available on GloBI
+        rglobi::get_interaction_types()
+
+    # For now let's focus on predator-prey interactions
+        prey <- rglobi::get_prey_of(sp)$target_taxon_name
+        pred <- rglobi::get_predators_of(sp)$target_taxon_name
+        prey
+        pred
 ```
+
+<!-- Add d3 object or igraph object? -->
 
 ## Make your search spatially explicit
 
@@ -123,7 +171,7 @@ OBIS is the [Ocean Biogeographic Information System](http://www.iobis.org/) and 
 
 
 ```{r,eval=FALSE}
-st_as_text(bb$geometry)
+sf::st_as_text(bb$geometry)
 OBIS <- robis::occurrence(scientificname = sp, geometry=st_as_text(bb$geometry), startdate = as.Date("2010-01-01"), enddate = as.Date("2017-01-01"))
 write.csv(OBIS,'obis.csv',row.names = FALSE)
 ```
@@ -132,7 +180,7 @@ write.csv(OBIS,'obis.csv',row.names = FALSE)
 
 We can easily visualize the data...
 
-```{r OBISPlot}
+```{r, OBISPlot, eval = FALSE}
 OBIS <- read.csv("obis.csv")
 plot(OBIS[,c("decimalLongitude", "decimalLatitude")])
 ```
@@ -143,7 +191,7 @@ plot(OBIS[,c("decimalLongitude", "decimalLatitude")])
 ### Define site map limits
 Let's start by defining a bounding box for your study site:
 
-```{r, bounding box}
+```{r, bounding box, eval = FALSE}
 #create a matrix
 bbmat <- cbind(
             c(lonmin,lonmax,lonmax,lonmin,lonmin),
@@ -167,7 +215,7 @@ There are many ways to add a basemap in R
 
 #### marmap package
 
-```{r,marmap}
+```{r,marmap, eval = FALSE}
 bathymetry <- getNOAA.bathy(lonmin,lonmax,latmin,latmax,resolution=1,keep=TRUE)
 plot.bathy(bathymetry,image=T,drawlabels=TRUE)
 
@@ -195,14 +243,14 @@ ggplot() +
 ```
 
 
-```{r}
-Canada <- getData('GADM', country="CAN", level=1) %>%
-    st_as_sf() %>%
-    filter(NAME_1=="Nova Scotia"|
-               NAME_1=="Prince Edward Island"|
-               NAME_1=="New Brunswick")
-ggplot() +
-    geom_sf(data=Canada,aes(fill=NAME_1))
+```{r, eval = FALSE}
+# Canada <- getData('GADM', country="CAN", level=1) %>%
+#     st_as_sf() %>%
+#     filter(NAME_1=="Nova Scotia"|
+#                NAME_1=="Prince Edward Island"|
+#                NAME_1=="New Brunswick")
+# ggplot() +
+#     geom_sf(data=Canada,aes(fill=NAME_1))
 
 x=0.2
 ggplot() +
@@ -217,7 +265,9 @@ ggplot() +
 
 ## Overlay your species occurrences over the base map
 
-```{r, }
+You can now overlay your species occurrences on your base map!
+
+```{r, eval = FALSE}
 OBIS <- st_as_sf(OBIS,
                  coords = c("decimalLongitude", "decimalLatitude"),
                  crs="+proj=longlat +datum=WGS84",
@@ -228,12 +278,101 @@ OBIS <- st_as_sf(OBIS,
     ggplot(OBIS) +
         geom_raster(data=bathyras,aes(x=x,y=y,fill=z))+
         geom_sf(data=bb,fill="transparent",colour='yellow',size=2)+
-        geom_sf(data=Canada,fill='grey40')+
+        # geom_sf(data=Canada,fill='grey40')+
         geom_point(data=OBIS,aes(x=decimalLongitude,y=decimalLatitude))+
         facet_wrap(~phylum)+
         coord_sf(xlim = c(lonmin-x,lonmax+x),
                  ylim = c(latmin-x,latmax+x),
                  expand = F)
 ```
+
+## Environmental variables
+
+There are also multiple resources to access environmental data. As seen before, we can easily access bathymetry data using the marmap package. Other environmental data can also be accessed using other packages like `raster` for terrestrial climatic data and `rnoaa`
+
+### Extract sea surface temperature (SST)
+
+```{r, NOAA, eval = TRUE}
+    # Bear with us, for simplicity's sake we will only take one year of data for one month, knowing very well that this does not make sense ecologically!
+    # Eventually use apply() to load multiple datasets and create rasterStack
+        # An exemple with sea ice
+            # urls <- seaiceeurls(mo='Apr', pole='N')[1:10]
+            # out <- lapply(urls, seaice)
+            # names(out) <- seq(1979,1988,1)
+            # df <- ldply(out)
+            # library('ggplot2')
+            # ggplot(df, aes(long, lat, group=group)) +
+            # geom_polygon(fill="steelblue") +
+            # theme_ice() +
+            # facet_wrap(~ .id)
+
+        sst.nc <- rnoaa::ersst(2010, 8, overwrite = TRUE)
+        sst <- raster(sst.nc$filename)
+
+    # Transform rasterLayer as a data.frame
+        sst.spdf <- as(sst, "SpatialPixelsDataFrame")
+        sst.df <- as.data.frame(sst.spdf)
+        colnames(sst.df) <- c('sst','x','y')
+
+    # Plot newly acquired data!
+        ggplot(sst.df, aes(x=x, y=y)) +
+            geom_tile(aes(x=x,y=y,fill=sst)) +
+            coord_equal()
+
+```
+
+## Species distribution models
+
+Now what we can do once we have species occurrence data and environmental variables are species distribution models (SDMs). There are multiple ways and packages to perform SDMs and this [vignette](https://cran.r-project.org/web/packages/dismo/vignettes/sdm.pdf) provides an extensive overview of the different methods available. For this workshop, we will be using the `package biomod2`, which implements most of the methods presented in the vignette.
+
+
+### Build a study area grid
+
+The first step is to build a regular grid covering the study area
+
+
+
+
+## Community level analyses
+
+One of the usual challenges in ecology is to perform analyses at the community scale often due to the difficulty of sampling multiple species in a single system. However, OBIS once again gives us the opportunity to access multiple species occurrences. Let's go back to OBIS and extract every available data in our system.
+
+```{r, multi species OBIS, eval = FALSE}
+    # Load all known species occurrences from our area of interest
+        multiOBIS <- robis::occurrence(geometry=st_as_text(bb$geometry), startdate = as.Date("2010-01-01"), enddate = as.Date("2017-01-01"), fields = c("species", "yearcollected","decimalLongitude", "decimalLatitude"))
+        multiOBIS <- multiOBIS[!is.na(multiOBIS[,'species']), ] # remove species == NA
+
+    # Select species for which there is at least n observations
+        n = 50
+        spOK <- names(which(table(multiOBIS[,'species']) >= n)) # id of species with at least n observations
+        multiOBIS <- multiOBIS[multiOBIS[, 'species'] %in% spOK, ] # Subset of multiOBIS data with species with at least n observations
+        multiOBIS[,'species'] <- as.factor(multiOBIS[,'species'])
+        multiOBIS[,'yearcollected'] <- as.factor(multiOBIS[,'yearcollected'])
+        write.csv(multiOBIS,'multiOBIS.csv',row.names = FALSE)
+```
+
+```{r, multiOBISPlot, eval = T}
+multiOBIS <- read.csv("multiOBIS.csv")
+str(multiOBIS)
+
+
+multiOBIS <- st_as_sf(multiOBIS,
+                 coords = c("decimalLongitude", "decimalLatitude"),
+                 crs="+proj=longlat +datum=WGS84",
+                 remove=FALSE) %>%
+    filter(!is.na(species))
+
+    ggplot(multiOBIS) +
+        geom_raster(data=bathyras,aes(x=x,y=y,fill=z))+
+        geom_sf(data=bb,fill="transparent",colour='yellow',size=2)+
+        geom_point(data=multiOBIS,aes(x=decimalLongitude,y=decimalLatitude))+
+        coord_sf(xlim = c(lonmin-x,lonmax+x),
+                 ylim = c(latmin-x,latmax+x),
+                 expand = F)
+```
+
+
+
+
 
 [<<BACK](https://remi-daigle.github.io/2017-CHONe-Data/)
