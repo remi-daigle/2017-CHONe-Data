@@ -74,6 +74,7 @@ Let's imagine that you are interested in a species in a given area and wish to k
     lonmax <- -55.73636
     lonmin <- -71.06333
 ```
+
 ## Describe your species
 
 ### Fishbase
@@ -118,62 +119,31 @@ How about extracting all known preys and predators of the species of interest?
 
 OBIS is the [Ocean Biogeographic Information System](http://www.iobis.org/) and their vision is: "To be the most comprehensive gateway to the world’s ocean biodiversity and biogeographic data and information required to address pressing coastal and world ocean concerns."
 
- We can get access to their HUGE database through the excellent `robis` package by [ropensci](https://ropensci.org/) (unsurprisingly, they also have other great open science R packages)
+ We can get access to their HUGE database through the excellent `robis` package by [ropensci](https://ropensci.org/) (unsurprisingly, they also have other great open science R packages, from which this whole section is highly inspired)
 
 
 ```{r,eval=FALSE}
 st_as_text(bb$geometry)
-OBIS <- robis::occurrence(geometry=st_as_text(bb$geometry))
+OBIS <- robis::occurrence(scientificname = sp, geometry=st_as_text(bb$geometry), startdate = as.Date("2010-01-01"), enddate = as.Date("2017-01-01"))
 write.csv(OBIS,'obis.csv',row.names = FALSE)
 ```
 
-```{r}
+### Visualize data
+
+We can easily visualize the data...
+
+```{r OBISPlot}
 OBIS <- read.csv("obis.csv")
-OBIS <- st_as_sf(OBIS,
-                 coords = c("decimalLongitude", "decimalLatitude"),
-                 crs="+proj=longlat +datum=WGS84",
-                 remove=FALSE) %>%
-    filter(!is.na(species))
-
-ggplot() +
-    geom_raster(data=bathyras,aes(x=x,y=y,fill=z))+
-    geom_sf(data=bb,fill="transparent",colour='yellow',size=2)+
-    geom_sf(data=Canada,fill='grey40')+
-    geom_point(data=OBIS,aes(colour=phylum,x=decimalLongitude,y=decimalLatitude,size=2))+
-    coord_sf(xlim = c(lonmin-x,lonmax+x),
-             ylim = c(latmin-x,latmax+x),
-             expand = F)
+plot(OBIS[,c("decimalLongitude", "decimalLatitude")])
 ```
 
-```{r}
-ggplot(OBIS) +
-    geom_raster(data=bathyras,aes(x=x,y=y,fill=z))+
-    geom_sf(data=bb,fill="transparent",colour='yellow',size=2)+
-    geom_sf(data=Canada,fill='grey40')+
-    geom_point(data=OBIS,aes(x=decimalLongitude,y=decimalLatitude))+
-    facet_wrap(~phylum)+
-    coord_sf(xlim = c(lonmin-x,lonmax+x),
-             ylim = c(latmin-x,latmax+x),
-             expand = F)
-```
+... but the aesthetics could be much better!
 
-
-
-
-##Plot your study site
+## Plot your study site
 ### Define site map limits
 Let's start by defining a bounding box for your study site:
 
-
 ```{r, bounding box}
-
-
-#define the corners
-latmax <- 46.25
-latmin <- 45.5
-lonmax <- -61.25
-lonmin <- -62.25
-
 #create a matrix
 bbmat <- cbind(
             c(lonmin,lonmax,lonmax,lonmin,lonmin),
@@ -191,13 +161,11 @@ str(bb)
 ggplot(bb) + geom_sf()
 ```
 
-Riveting!
-
 ### Add a basemap!
 
 There are many ways to add a basemap in R
 
-## marmap package
+#### marmap package
 
 ```{r,marmap}
 bathymetry <- getNOAA.bathy(lonmin,lonmax,latmin,latmax,resolution=1,keep=TRUE)
@@ -247,7 +215,25 @@ ggplot() +
 
 ```
 
+## Overlay your species occurrences over the base map
+
+```{r, }
+OBIS <- st_as_sf(OBIS,
+                 coords = c("decimalLongitude", "decimalLatitude"),
+                 crs="+proj=longlat +datum=WGS84",
+                 remove=FALSE) %>%
+    filter(!is.na(species))
 
 
+    ggplot(OBIS) +
+        geom_raster(data=bathyras,aes(x=x,y=y,fill=z))+
+        geom_sf(data=bb,fill="transparent",colour='yellow',size=2)+
+        geom_sf(data=Canada,fill='grey40')+
+        geom_point(data=OBIS,aes(x=decimalLongitude,y=decimalLatitude))+
+        facet_wrap(~phylum)+
+        coord_sf(xlim = c(lonmin-x,lonmax+x),
+                 ylim = c(latmin-x,latmax+x),
+                 expand = F)
+```
 
 [<<BACK](https://remi-daigle.github.io/2017-CHONe-Data/)
