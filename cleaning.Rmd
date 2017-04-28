@@ -503,6 +503,9 @@ install.packages('rglobi') # To access interactions data
 
 devtools::install_github("ropensci/rnoaa") # To access environmental data from the NOAA databases
 
+install.packages('knitr')
+
+
 # to gain access to the functions in a package, you can use library(), eg:
 library(tidyverse)
 ```
