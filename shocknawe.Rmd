@@ -12,15 +12,158 @@ output:
 
 (Remi/David)
 
-##Plot your study site
-### Define site map limits
-Let's start by defining a bounding box for your study site:
+<!--
+
+library(rmarkdown)
+render(input = 'shocknawe.rmd', 'html_document')
+
+-->
+
+
+
+<!-- ## Structure of document
+
+Get people acquainted with existing possibilities in R from environmental point of view and oceanographic point of view
+
+Structure for shock and awe portion 1.
+Ecologically describe a study area from available open source data
+
+1. Define study area
+2.
+
+- SDM
+- Species interactions
+- Environmental data
+- Go look at ropensci
+- wordcloud2
+
+4. How about it's phylogeny?
+
+    install.package('brranching')
+
+
+Now that we have a pretty thorough description of the species, what else could we find out. How about known occurrence in our study area
+
+
+How about fisheries activity?
+install.package('rfisheries') -->
+
+
 ```{r, message=FALSE}
 library(sf)
 library(marmap)
 library(raster)
 library(tidyverse)
+library(ggplot2)
 ```
+
+# IMAGINE!
+
+Let's imagine that you are interested in a species in a given area and wish to know as much as possible about it. But, you can't go out in the field because funding is running short. What you do have, however, is a certain knowledge of the tools that are available to you and you are wondering how far they can take you. Let's find out.
+
+## Defining species and area of interest
+
+```{r, params}
+    # Let's select Atlantic cod as our species of interest
+    sp <- 'Gadus morhua'
+
+    # And the gulf of St. Lawrence as our study area
+    #define the corners
+    latmax <- 52.01312
+    latmin <- 45.52399
+    lonmax <- -55.73636
+    lonmin <- -71.06333
+```
+## Describe your species
+
+### Fishbase
+
+We'll start with a description of the species. First, let's see what [fishbase](http://www.fishbase.ca/) has to offer.
+
+```{r, ecology}
+    # install.packages('rfishbase')
+    descr <- rfishbase::species(sp)
+    ecol <- rfishbase::ecology(sp)
+    ecol <- cbind(colnames(ecol), t(ecol))
+    rownames(ecol) <- NULL
+
+    kable(ecol, col.names = c('Descriptors', 'Attributes'))
+```
+
+### Taxize
+
+We can also get it's taxonomy rather easily.
+
+```{r, taxonomy}
+    # install.packages('taxize')
+    taxo <- taxize::classification(sp, db = 'worms', verbose = FALSE)
+    kable(taxo[[1]])
+```
+
+### GloBI
+
+How about extracting all known preys and predators of the species of interest?
+
+```{r, trophic}
+    # install.packages('rglobi')
+    prey <- rglobi::get_prey_of(sp)$target_taxon_name
+    pred <- rglobi::get_predators_of(sp)$target_taxon_name
+    prey
+    pred
+```
+
+## Make your search spatially explicit
+
+### Get data from OBIS
+
+OBIS is the [Ocean Biogeographic Information System](http://www.iobis.org/) and their vision is: "To be the most comprehensive gateway to the world’s ocean biodiversity and biogeographic data and information required to address pressing coastal and world ocean concerns."
+
+ We can get access to their HUGE database through the excellent `robis` package by [ropensci](https://ropensci.org/) (unsurprisingly, they also have other great open science R packages)
+
+
+```{r,eval=FALSE}
+st_as_text(bb$geometry)
+OBIS <- robis::occurrence(geometry=st_as_text(bb$geometry))
+write.csv(OBIS,'obis.csv',row.names = FALSE)
+```
+
+```{r}
+OBIS <- read.csv("obis.csv")
+OBIS <- st_as_sf(OBIS,
+                 coords = c("decimalLongitude", "decimalLatitude"),
+                 crs="+proj=longlat +datum=WGS84",
+                 remove=FALSE) %>%
+    filter(!is.na(species))
+
+ggplot() +
+    geom_raster(data=bathyras,aes(x=x,y=y,fill=z))+
+    geom_sf(data=bb,fill="transparent",colour='yellow',size=2)+
+    geom_sf(data=Canada,fill='grey40')+
+    geom_point(data=OBIS,aes(colour=phylum,x=decimalLongitude,y=decimalLatitude,size=2))+
+    coord_sf(xlim = c(lonmin-x,lonmax+x),
+             ylim = c(latmin-x,latmax+x),
+             expand = F)
+```
+
+```{r}
+ggplot(OBIS) +
+    geom_raster(data=bathyras,aes(x=x,y=y,fill=z))+
+    geom_sf(data=bb,fill="transparent",colour='yellow',size=2)+
+    geom_sf(data=Canada,fill='grey40')+
+    geom_point(data=OBIS,aes(x=decimalLongitude,y=decimalLatitude))+
+    facet_wrap(~phylum)+
+    coord_sf(xlim = c(lonmin-x,lonmax+x),
+             ylim = c(latmin-x,latmax+x),
+             expand = F)
+```
+
+
+
+
+##Plot your study site
+### Define site map limits
+Let's start by defining a bounding box for your study site:
+
 
 ```{r, bounding box}
 
@@ -45,11 +188,10 @@ bb <- st_sf(name="Study Site",geometry=bbsfc)
 str(bb)
 
 # plot it!
-ggplot(bb)+
-    geom_sf()
+ggplot(bb) + geom_sf()
 ```
 
-Riveting! 
+Riveting!
 
 ### Add a basemap!
 
@@ -73,7 +215,7 @@ plot.bathy(bathymetry,
 
 # this is a 'bathy' object and you could plot it as is with the tools provided in marmap, but to keep things 'simple' I'm going to convert to sf. There is no direct method yet, so... don't judge me!
 # convert from bathy to raster to 'sp' polygon to simple features
-# bathypoly <- marmap::as.raster(bathymetry) %>% 
+# bathypoly <- marmap::as.raster(bathymetry) %>%
     # rasterToPolygons() %>% st_as_sf
 bathyras <- fortify.bathy(bathymetry)
 
@@ -86,8 +228,8 @@ ggplot() +
 
 
 ```{r}
-Canada <- getData('GADM', country="CAN", level=1) %>% 
-    st_as_sf() %>% 
+Canada <- getData('GADM', country="CAN", level=1) %>%
+    st_as_sf() %>%
     filter(NAME_1=="Nova Scotia"|
                NAME_1=="Prince Edward Island"|
                NAME_1=="New Brunswick")
@@ -101,53 +243,11 @@ ggplot() +
     geom_sf(data=Canada,fill='grey40')+
     coord_sf(xlim = c(lonmin-x,lonmax+x),
              ylim = c(latmin-x,latmax+x),
-             expand = F) 
-
-```
-
-
-## Get data from OBIS
- 
-OBIS is the [Ocean Biogeographic Information System](http://www.iobis.org/) and their vision is: "To be the most comprehensive gateway to the world’s ocean biodiversity and biogeographic data and information required to address pressing coastal and world ocean concerns."
- 
- We can get access to their HUGE database through the excellent `robis` package by [ropensci](https://ropensci.org/) (unsurprisingly, they also have other great open science R packages)
- 
- 
-```{r,eval=FALSE}
-st_as_text(bb$geometry)
-OBIS <- occurrence(geometry=st_as_text(bb$geometry))
-write.csv(OBIS,'obis.csv',row.names = FALSE)
-```
-
-```{r}
-OBIS <- read.csv("obis.csv")
-OBIS <- st_as_sf(OBIS,
-                 coords = c("decimalLongitude", "decimalLatitude"),
-                 crs="+proj=longlat +datum=WGS84",
-                 remove=FALSE) %>% 
-    filter(!is.na(species))
-
-ggplot() +
-    geom_raster(data=bathyras,aes(x=x,y=y,fill=z))+
-    geom_sf(data=bb,fill="transparent",colour='yellow',size=2)+
-    geom_sf(data=Canada,fill='grey40')+
-    geom_point(data=OBIS,aes(colour=phylum,x=decimalLongitude,y=decimalLatitude,size=2))+
-    coord_sf(xlim = c(lonmin-x,lonmax+x),
-             ylim = c(latmin-x,latmax+x),
              expand = F)
+
 ```
 
-```{r}
-ggplot(OBIS) +
-    geom_raster(data=bathyras,aes(x=x,y=y,fill=z))+
-    geom_sf(data=bb,fill="transparent",colour='yellow',size=2)+
-    geom_sf(data=Canada,fill='grey40')+
-    geom_point(data=OBIS,aes(x=decimalLongitude,y=decimalLatitude))+
-    facet_wrap(~phylum)+
-    coord_sf(xlim = c(lonmin-x,lonmax+x),
-             ylim = c(latmin-x,latmax+x),
-             expand = F)
-```
+
 
 
 [<<BACK](https://remi-daigle.github.io/2017-CHONe-Data/)
