@@ -491,7 +491,7 @@ OBIS once again gives us the opportunity to access multiple species occurrences.
 We can now visualize the network using the package iGraph
 
 ```{r, foodWeb iGraph}
-
+    nsp <- length(spList)
     foodWeb <- readRDS('./foodWeb.rds')
 
     netw <-  igraph::graph_from_adjacency_matrix(t(foodWeb))
@@ -586,7 +586,7 @@ In order to create common observations among individual observations, we will ag
 
 ##### Intersect occurrences and environmental data with grid
 
-```{r, occGrid, eval = FALSE}
+```{r, occGrid, eval = TRUE}
     # reload multiOBIS data and transform into sp points
         multiOBIS <- read.csv("multiOBIS.csv")
         proj <- "+proj=longlat +datum=WGS84"
