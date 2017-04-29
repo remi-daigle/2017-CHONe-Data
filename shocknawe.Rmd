@@ -569,7 +569,7 @@ In order to create common observations among individual observations, we will ag
         egsl <- rgdal::readOGR(dsn = "./", layer = "egsl")
 
     # Create grid
-        egsl_grid <- hexGrid(size = 30000, shp_over = egsl)
+        egsl_grid <- hexGrid(size = 10000, shp_over = egsl)
         rgdal::writeOGR(egsl_grid, dsn = './', layer = 'egsl_grid', driver="ESRI Shapefile", overwrite_layer=TRUE)
 
     # Plot grid
@@ -609,8 +609,8 @@ In order to create common observations among individual observations, we will ag
         multiOBIS_wide <- rbind(multiOBIS_wide, matSup)
         multiOBIS_wide <- multiOBIS_wide[-which(is.na(multiOBIS_wide[,'ID']) == T), ]
         egsl_grid@data <- merge(egsl_grid@data, multiOBIS_wide, by = 'ID')
-        sp <- colnames(egsl_grid@data)[2:ncol(egsl_grid@data)]
-        spID <- seq(1:length(sp))
+        spAll <- colnames(egsl_grid@data)[2:ncol(egsl_grid@data)]
+        spID <- seq(1:length(spAll))
         colnames(egsl_grid@data)[2:ncol(egsl_grid@data)] <- spID
 
     # Extract environmental values from rasters
@@ -622,13 +622,14 @@ In order to create common observations among individual observations, we will ag
     # HMSC data
         studyGrid <- egsl_grid@data
 
-    envCov <-  c('bathy','sst')
+        envCov <-  c('bathy','sst')
 
     # Remove environmental NAs
         NAs <- studyGrid[, envCov] %>%
                 lapply(X = ., FUN = function(x) which(is.na(x))) %>%
                 unlist(.) %>%
                 unique(.)
+        NAsID <- studyGrid[NAs,'ID']
 
         studyGrid <- studyGrid[-NAs, ]
 ```
@@ -741,7 +742,7 @@ model <- readRDS('./HMSCmodel.rds')
             arrows(x0 = 1:nrow(paramXCITable), x1 = 1:nrow(paramXCITable), y0 = paramXCITable[, 2], y1 = paramXCITable[, 3], code = 3, angle = 90, length = 0.05, col = cols)
             points(1:nrow(paramXCITable), paramXCITable[,1], pch = 15, cex = 1, col = cols)
         }
-        mtext(text = sp, side = 1, line = 1, outer = FALSE, at = 1:nsp, col = 1, las = 2, cex = 0.4)
+        mtext(text = spAll, side = 1, line = 1, outer = FALSE, at = 1:nsp, col = 1, las = 2, cex = 0.4)
 ```
 
 ```{r, association networks}
@@ -753,7 +754,7 @@ model <- readRDS('./HMSCmodel.rds')
 
     # Average
         plotMean <- apply(assoMat[, , , 1], 1:2, mean)
-        colnames(plotMean) <- rownames(plotMean) <- sp
+        colnames(plotMean) <- rownames(plotMean) <- spAll
 
     # Build matrix of colours for chordDiagram
         plotDrawCol <- matrix(NA, nrow = nrow(plotMean), ncol = ncol(plotMean))
@@ -809,6 +810,44 @@ model <- readRDS('./HMSCmodel.rds')
         abline(h = 0.5, col = 'grey')
         arrows(x0 = prevSp, x1 = prevSp, y0 = (meanAUC - sdAUC), y1 = (meanAUC + sdAUC), code = 3, angle = 90, length = 0.05)
         points(prevSp, meanAUC, pch = 19, cex = 0.8)
+```
+
+```{r, predictions}
+# Generate predictions
+    HMSCpred <- predict(model)
+
+# Replace NAs in grid
+    data <- matrix(nrow = (length(NAs) + nrow(HMSCpred)), ncol = ncol(HMSCpred), data = 0)
+    dimnames(data) = list(paste('ID',seq(1:nrow(data)), sep = ''), colnames(HMSCpred))
+
+    for(i in 1:length(NAsID)) {
+        data[which(rownames(data) == NAsID[i]), ] <- NA
+    }
+
+    for(i in 1:nrow(HMSCpred)) {
+        data[which(rownames(data) == rownames(HMSCpred)[i]), ] <- HMSCpred[i, ]
+    }
+
+    HMSCpred <- data
+    HMSCpred <- cbind(HMSCpred, rownames(HMSCpred))
+    colnames(HMSCpred)[ncol(HMSCpred)] <- 'ID'
+    colnames(HMSCpred) <- spAll
+```
+
+
+```{r, plotPred, eval = TRUE, message = FALSE}
+    # Plot grid
+        egsl_grid <- rgdal::readOGR(dsn = "./", layer = "egsl_grid")
+        proj <- "+proj=longlat +datum=WGS84"
+        egsl_grid <- sp::spTransform(egsl_grid, CRSobj = CRS(proj))
+
+
+        egsl_grid@data <- merge(egsl_grid@data, HMSCpred, by = 'ID')
+        data <- egsl_grid@data[,100]
+        rbPal <- colorRampPalette(c('#2f6eb9','#2aadba','#b45f5f')) # color palette
+        cols <- rbPal(50)[as.numeric(cut(as.numeric(data), breaks = 50))]
+
+        plot(egsl_grid, col = cols, border = cols)
 ```
 
 
