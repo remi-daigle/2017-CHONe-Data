@@ -505,6 +505,13 @@ devtools::install_github("ropensci/rnoaa") # To access environmental data from t
 
 install.packages('knitr')
 
+install.packages('biomod2') # to perform species distribution models
+
+install.packages('iGraph') # to produce network plots
+
+install.packages('networkD3') # to produce html (a.k.a. interactive) network plots!
+
+devtools::install_github("guiblanchet/HMSC") # package to perform hierarchical modeling of species communities 
 
 # to gain access to the functions in a package, you can use library(), eg:
 library(tidyverse)
