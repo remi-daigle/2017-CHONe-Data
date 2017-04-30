@@ -511,7 +511,17 @@ install.packages('iGraph') # to produce network plots
 
 install.packages('networkD3') # to produce html (a.k.a. interactive) network plots!
 
-devtools::install_github("guiblanchet/HMSC") # package to perform hierarchical modeling of species communities 
+devtools::install_github("guiblanchet/HMSC") # package to perform hierarchical modeling of species communities
+
+install.packages('coda') # package to summarize and plot outputs from Markov Chains
+
+install.packages('corrplot') # visualization of correlation matrices
+
+install.packages('circlize') # circular visualization of data
+
+install.packages('ModelMetrics') # collection of metrics coded for efficiency in C++ using Rcpp
+
+
 
 # to gain access to the functions in a package, you can use library(), eg:
 library(tidyverse)
