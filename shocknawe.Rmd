@@ -831,7 +831,7 @@ model <- readRDS('./HMSCmodel.rds')
     HMSCpred <- data
     HMSCpred <- cbind(HMSCpred, rownames(HMSCpred))
     colnames(HMSCpred)[ncol(HMSCpred)] <- 'ID'
-    colnames(HMSCpred) <- spAll
+    # colnames(HMSCpred) <- spAll
 ```
 
 
@@ -843,13 +843,16 @@ model <- readRDS('./HMSCmodel.rds')
 
 
         egsl_grid@data <- merge(egsl_grid@data, HMSCpred, by = 'ID')
-        data <- egsl_grid@data[,100]
+
+        data <- egsl_grid@data[,31]
         rbPal <- colorRampPalette(c('#2f6eb9','#2aadba','#b45f5f')) # color palette
         cols <- rbPal(50)[as.numeric(cut(as.numeric(data), breaks = 50))]
-
         plot(egsl_grid, col = cols, border = cols)
+
 ```
 
+
+[leaflet example](https://letir.github.io/Elections_fr-042017/)
 
 
 [<<BACK](https://remi-daigle.github.io/2017-CHONe-Data/)
