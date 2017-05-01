@@ -521,6 +521,27 @@ install.packages('circlize') # circular visualization of data
 
 install.packages('ModelMetrics') # collection of metrics coded for efficiency in C++ using Rcpp
 
+install.packages("pdftools") # to extract pdf content
+
+install.packages('stringr') # Simple, Consistent Wrappers for Common String Operations
+
+install.packages('tidytext') # text analysis package
+
+install.packages('viridis') # Port of the new 'matplotlib' color maps
+
+install.packages('tibble') # Simple Data Frames
+
+devtools::install_github("dgrtwo/widyr") # Widen, process, and re-tidy a dataset
+
+install.packages('ggraph') # An Implementation of Grammar of Graphics for Graphs and Networks
+
+install.packages('wordcloud2') # wordle generator
+
+install.packages('leaflet') # Create and customize interactive maps
+
+install.packages('mapview') # Interactive Viewing of Spatial Objects in R
+
+install.packages('scales') # Graphical scales map data to aesthetics
 
 
 # to gain access to the functions in a package, you can use library(), eg:
