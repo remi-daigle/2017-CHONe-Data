@@ -10,6 +10,365 @@ output:
 ---
 [<<BACK](https://remi-daigle.github.io/2017-CHONe-Data/)
 
-http://juliasilge.com/blog/Life-Changing-Magic/
+<!--
+
+rm(list=ls())
+setwd('/Users/davidbeauchesne/dropbox/phd/misc/2017-chone-data/2017-chone-data/')
+library(rmarkdown)
+render(input = 'text.rmd', 'html_document')
+
+-->
+
+packages::
+install.packages("pdftools")
+install.packages('stringr')
+install.packages('tidytext')
+install.packages('viridis')
+install.packages('tibble')
+devtools::install_github("dgrtwo/widyr")
+install.packages('ggraph')
+install.packages(wordcloud2)
+devtools::install_github("Lchiffon/wordcloud2")
+
+<!--
+Tabulize, if time
+    devtools::install_github('ropensci/tabulizerjars')
+    devtools::install_github('ropensci/tabulizer')
+-->
+
+
+
+# Text analysis in R
+
+To begin, we wish to credit Julia Silge for much of the material presented here. Her [post](http://juliasilge.com/blog/Life-Changing-Magic/) on `tidytext` data analysis and the code therein inspired most of this portion of the workshop.
+
+```{r, libraries, message = FALSE}
+library(janeaustenr)
+library(dplyr)
+library(tidytext)
+library(pdftools)
+library(stringr)
+library(tidyr)
+library(ggplot2)
+library(viridis)
+library(tibble)
+library(knitr)
+library(widyr)
+library(ggraph)
+library(wordcloud2)
+library(magrittr)
+```
+
+## Selecting a text to analyze for the workshop
+
+Let's begin by downloading a document that all of us should be aware of, *i.e.* Paul Snelgrove's entitled 'Discoveries of the Census of Marine Life:
+Making Ocean Life Count' (text available for free [here](http://www.cambridge.org/download_file/153663)).
+
+```{r, load file, eval = FALSE}
+    # Download file from the web
+        download.file('http://www.cambridge.org/download_file/153663','Snelgrove_Text_Only.pdf', mode = 'wb')
+```
+
+## Importing text from pdfs in R
+
+The package [`pdftools`](https://ropensci.org/blog/blog/2016/03/01/pdftools-and-jeroen) allows you to read the content of a pdf rather easily and is available on ROpenSci. See package details for more functions
+
+```{r, read pdf}
+    # Read pdf file
+        book <- pdf_text("Snelgrove_Text_Only.pdf")
+
+        book[1]
+        length(book)
+```
+
+<br/>
+As you can see, the resulting text is coerced as a page per string for a total of 398 pages, with lines divided by '\\n'. Let's tidy up the text to make it more easily usable for further analyses.
+
+## Extracting tables from pdfs in R
+
+<br/>
+If you look at the actual pdf, you will realize that tables are not imported in r with the `pdf_text` function. If you wish to do so, there is a package called [`tabulizer`](https://ropensci.org/blog/blog/2017/04/18/tabulizer).
+
+```{r, table}
+    # To build
+```
+
+## Tidy up text
+
+```{r, tidy text}
+    # Divide strings per line using '\n as a separator'
+        book <- str_split(book, '\n')
+        book[[1]][1:10]
+
+    # Trim whitespaces at the beginning and end of lines
+        book <- lapply(X = book, FUN = str_trim, side = 'both')
+        book[[1]][1:10]
+
+    # Transform as a matrix
+        bookMat <- matrix(nrow = 0, ncol = 3, dimnames = list(c(), c('text','page','document')))
+
+        for(i in 1:length(book)) {
+            bk <- cbind(book[[i]], rep(i, length(book[[i]])), 1)
+            bookMat <- rbind(bookMat, bk)
+        }
+
+        kable(bookMat[1:10, ])
+
+    # Remove empty strings
+        bookMat[bookMat[,'text'] == '', 'text'] <- NA
+        bookMat <- na.omit(bookMat)
+
+    # Convert to data.frame
+        bookMat <- as.data.frame(bookMat)
+        bookMat[, 'text'] <- as.character(bookMat[, 'text'])
+        bookMat[, 'page'] <- as.numeric(paste(bookMat[, 'page']))
+        bookMat[, 'document'] <- as.numeric(paste(bookMat[, 'document']))
+        kable(bookMat[1:10, ])
+```
+
+## Text analysis
+
+<br/>
+Now that we have our document as a R data frame, we can start playing around with it. There are multiple packages that allow you perform text analyses. We will focus on package `tidytext` as it aligns with the tidyverse, but the package `tm` is another important package used to perform text analysis under R. Each package uses certain classes of object, but classes can be modified quite easily for use between the packages. See this [vignette](http://127.0.0.1:15641/library/tidytext/doc/tidying_casting.html) for a description of steps and functions used to achieve this.
+
+We will first transform the book as a [tibble class object](https://www.rdocumentation.org/packages/tibble/versions/1.2) for use in `tidytext`
+
+```{r, tidytext}
+    # Convert to tibble class object for use in tidytext
+        tidyBook <- as_tibble(bookMat)
+        tidyBook
+```
+<br/>
+### Group your text by attributes
+
+<br/>
+The book can easily be grouped by certain criterion. For exemple, we will start by grouping the data according to which part of the book they belong. There are a total of three parts to this book. Unfortunately, this particular process does not work for our pdf document, but the code does work we might use it again elsewhere, let's say for an exercice (*cough cough*).
+
+```{r, group chapters}
+bookChapter <- tidyBook %>%
+                    mutate(linenumber = row_number(),
+                           chapter = cumsum(str_detect(text, regex("^part [\\divxlc]", ignore_case = TRUE)))) %>%
+                    ungroup()
+
+bookChapter
+unique(bookChapter[, 'chapter'])
+```
+
+<br/>
+### Term frequency
+
+A frequent analysis performed with text is to evaluate the frequency of words used in the text. This can be done by first unnesting the individual words from the text with the `unnest_tokens` function and using the `count` function to count the number of words.
+
+```{r, words}
+    # Count per word
+        bookWords <- tidyBook %>%
+                        unnest_tokens(word, text) %>% # divide by word
+                        count(word, sort = TRUE) # counts the word frequency
+        bookWords
+
+    # Total number of words
+        totalWords <- bookWords %>% summarize(total = sum(n))
+        totalWords
+```
+
+<br/>
+You could also apply this directly to the data grouped by chapters to obtain a word count per chapters.
+
+```{r, words chapter}
+    # Count per word per chapter
+        bookWordsChapter <- bookChapter %>%
+                                unnest_tokens(word, text) %>%
+                                count(chapter, word, sort = TRUE) %>%
+                                ungroup()
+
+    # Attach total number of words per chapter                            
+        totalWordsChapter <- bookWordsChapter %>% group_by(chapter) %>% summarize(total = sum(n))
+        totalWordsChapter
+
+        bookWordsChapter <- left_join(bookWordsChapter, totalWordsChapter)
+        bookWordsChapter
+
+        ggplot(bookWordsChapter, aes(n/total, fill = chapter)) +
+          geom_histogram(show.legend = FALSE) +
+          xlim(NA, 0.0009) +
+          facet_wrap(~chapter, ncol = 2, scales = "free_y")
+
+```
+<br/>
+Words like 'the', 'and', 'of' are the most common by far. Those are referred to as *stop words* and are usually removed in text analysis. A list of such words is available in the `stop_words` dataset and can be removed from your dataset using function `anti_join`.
+
+```{r, stop words}
+    # Count per word after stop words removal
+        data("stop_words")
+        bookWords <- tidyBook %>%
+                        unnest_tokens(word, text) %>% # divide by word
+                        anti_join(stop_words) %>% # remove stop words
+                        count(document, word, sort = TRUE) %>% # counts the word frequency
+                        ungroup()
+
+        totalWords <- bookWords %>% group_by(document) %>% summarize(total = sum(n))
+        bookWords <- left_join(bookWords, totalWords)
+        bookWords
+
+        ggplot(bookWords, aes(n/total, fill = document)) +
+          geom_histogram(show.legend = FALSE) +
+          xlim(NA, 0.0009) +
+          facet_wrap(~document, ncol = 2, scales = "free_y")
+```
+
+### Sentiment analysis
+
+`tidytext` also gives the opportunity to perform a cursory sentiment analysis, *i.e.* evaluating whether the text is more or less negative, using the `sentiment` dataset. While it may not be as useful to qualify positive or negative science, it may reveal some insights as to the overall style of writing of the author (we are looking at you Dr. Snelgrove).
+
+```{r, sentiment}
+    # Gather list of sentiments from tidytext
+        bing <- sentiments %>%
+                filter(lexicon == "bing") %>%
+                select(-score)
+        bing
+
+        paulsentiment <- tidyBook %>%
+                            mutate(linenumber = row_number()) %>%
+                            ungroup() %>%
+                            unnest_tokens(word, text) %>% # divide by word
+                            anti_join(stop_words) %>%
+                            inner_join(bing) %>%
+                            count(document, index = linenumber %/% 80, sentiment) %>%
+                            spread(sentiment, n, fill = 0) %>%
+                            mutate(sentiment = positive - negative)
+        paulsentiment
+
+        # plot
+            ggplot(paulsentiment, aes(index, sentiment, fill = document)) +
+                    geom_bar(stat = "identity", show.legend = FALSE) +
+                    facet_wrap(~document, ncol = 2, scales = "free_x") +
+                    theme_minimal(base_size = 13) +
+                    labs(title = "Sentiment in Paul Snelgrove's writing",
+                         y = "Sentiment") +
+                    scale_fill_viridis(end = 0.75, discrete=FALSE, direction = -1) +
+                    scale_x_discrete(expand=c(0.02,0)) +
+                    theme(strip.text=element_text(hjust=0)) +
+                    theme(strip.text = element_text(face = "italic")) +
+                    theme(axis.title.x=element_blank()) +
+                    theme(axis.ticks.x=element_blank()) +
+                    theme(axis.text.x=element_blank())
+
+        # Most common positive and negative words
+            bing_word_counts <- tidyBook %>%
+                                    mutate(linenumber = row_number()) %>%
+                                    ungroup() %>%
+                                    unnest_tokens(word, text) %>% # divide by word
+                                    anti_join(stop_words) %>%
+                                    inner_join(bing) %>%
+                                    count(word, sentiment, sort = TRUE) %>%
+                                    ungroup()
+
+        # Contribution to sentiment
+            bing_word_counts %>%
+              filter(n > 10) %>%
+              mutate(n = ifelse(sentiment == "negative", -n, n)) %>%
+              mutate(word = reorder(word, n)) %>%
+              ggplot(aes(word, n, fill = sentiment)) +
+              geom_bar(stat = "identity") +
+              theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
+              ylab("Contribution to sentiment")
+```
+
+### "Units Beyond Words"
+
+Words are not the only units of text that can be extracted using the `unnest_tokens` function. Look at the package vignette for more information!
+
+```{r, sentences}
+
+paulSentences <- tidyBook %>%
+                    group_by(document) %>%
+                    unnest_tokens(sentence, text, token = "sentences") %>%
+                    ungroup()
+
+
+paulSentences$sentence[50]
+```
+
+### Networks of Words
+
+`pair_count`
+
+```{r, pair count, eval = FALSE}
+
+bookWords <- tidyBook %>%
+                    mutate(linenumber = row_number()) %>%
+                    ungroup() %>%
+                    unnest_tokens(word, text) # divide by word
+
+wordOcc <- bookWords %>%
+        pairwise_count(linenumber, word, sort = TRUE)
+wordOcc
+
+library(igraph)
+library(ggraph)
+
+set.seed(1813)
+wordOcc %>%
+        filter(n >= 10) %>%
+        graph_from_data_frame() %>%
+        ggraph(layout = "fr") +
+        geom_edge_link(aes(edge_alpha = n, edge_width = n)) +
+        geom_node_point(color = "darkslategray4", size = 5) +
+        geom_node_text(aes(label = name), vjust = 1.8) +
+        ggtitle(expression(paste("Word Network in Paul Snelgrove's book ",
+                                 italic("Census of Marine Life")))) +
+        theme_void()
+
+
+        x <- wordOcc %>%
+                filter(n >= 10) %>%
+                graph_from_data_frame()
+
+        netwD3 <- networkD3::igraph_to_networkD3(x, group = rep(1, vcount(x)), what = 'both')
+
+        networkD3::forceNetwork(Links = netwD3$links,
+                                Nodes = netwD3$nodes,
+                                Source = 'source',
+                                Target = 'target',
+                                NodeID = 'name',
+                                Group = 'group',
+                                zoom = TRUE,
+                                linkDistance = 50,
+                                fontSize = 12,
+                                opacity = 0.9,
+                                charge = -10)
+```
+
+
+```{r, wordcloud}
+
+        bookWords <- tidyBook %>%
+                        unnest_tokens(word, text) %>% # divide by word
+                        anti_join(stop_words) %>% # remove stop words
+                        count(document, word, sort = TRUE) %>% # counts the word frequency
+                        ungroup() %>%
+                        filter(n >= 10)
+
+        bookWords <- as.data.frame(bookWords[, c('word','n')])
+
+        # letterCloud(bookWords, word = 'Paul Snelgrove',size = 2, color="white", backgroundColor=1)
+
+wordcloud2(bookWords, color = "random-light", backgroundColor = "grey")
+
+letterCloud(matrix(ncol=2, data = seq(1:100)), word = 'R')
+        wordcloud2(matrix(ncol=2, data = seq(1:100)), figPath = './CoML_icon.png')
+        wordcloud2(bookWords, shape = 'star')
+
+        wordcloud2(bookWords, figPath = './CoML_icon.png', size = 2, color = 'white', backgroundColor = 1)
+#
+        # wordcloud2(as.matrix(bookWords[, c('word','n')]), figPath = './CoML.jpg')
+
+```
+wordcloud2(demoFreq, size = 1,shape = 'star')
+
+wordcloud2(dat, figPath = "./img/butterfly.png", size = 2, color="white", backgroundColor=1)
+
+figPath = CHONe
+
 
 [<<BACK](https://remi-daigle.github.io/2017-CHONe-Data/)
