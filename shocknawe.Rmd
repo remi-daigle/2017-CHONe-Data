@@ -17,7 +17,7 @@ output:
 rm(list=ls())
 setwd('/Users/davidbeauchesne/dropbox/phd/misc/2017-chone-data/2017-chone-data/')
 library(rmarkdown)
-render(input = 'shocknawe.rmd', 'html_document')
+render(input = 'shocknawe.rmd', 'all')
 
 -->
 
@@ -51,7 +51,12 @@ How about fisheries activity?
 install.package('rfisheries') -->
 
 <!--
--->
+library(sp) ; library(mapview)
+pnt <- SpatialPoints(coords = data.frame(x = 174.764474, y = -36.877245), proj4string = CRS('+init=epsg:4326'))
+mapview(pnt, popup = mapview:::popupIframe("https://www.youtube.com/embed/iApz08Bh53w?autoplay=1", width = 300, height = 225))
+ -->
+
+
 
 ```{r, message=FALSE}
 library(sf)
@@ -60,6 +65,22 @@ library(raster)
 library(tidyverse)
 library(ggplot2)
 ```
+
+
+
+This portion of the workshop is dedicated to providing an overview of possibilities using R. This section is by no means an exhaustive presentation of what is possible in R. At this point, it would be impossible (read *very very hard for us*) to provide such an exhaustive overview. The R community is fast growing and dynamic, so much so that new packages and ways to use them are posted every day all over the web. This portion of the workshop is therefore rather a biologist's perspective on what you could do if you wish to use R for something else than stats analyses.
+
+Keep in mind: *If you can imagine it, someone probably has before you and chances are it's already implemented and available under some sort of function or package in R*.
+
+With that in mind, here is a list (not ordered with any sort of priority or relevance) of a few resources from which we are regularly using to keep on top of new developments and to search for help achieving whatever it is we imagine we could do. Use it abundantly!
+
+- [ROpenSci](https://ropensci.org/)
+- [RBloggers](https://www.r-bloggers.com/)
+- [Stack overflow](http://stackoverflow.com/)
+- [DataCamp](https://www.datacamp.com)
+- [Software carpentry](https://software-carpentry.org/)
+- Useful function: `vignette(package = 'packagename')`, type ?vignette in R for more information
+
 
 # IMAGINE!
 
