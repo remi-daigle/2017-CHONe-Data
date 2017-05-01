@@ -13,9 +13,9 @@ output:
 
 Please Download:
 
-[PDF](https://github.com/remi-daigle/2017-CHONe-Data/raw/gh-pages/Angela/DataWorkshop_Metadata.pdf)
+[PDF](https://github.com/remi-daigle/2017-CHONe-Data/raw/gh-pages/Angela/DataWorkshop_Sharing.pdf)
 
-[PPT](https://github.com/remi-daigle/2017-CHONe-Data/raw/gh-pages/Angela/DataWorkshop_Metadata.pptx)
+[PPT](https://github.com/remi-daigle/2017-CHONe-Data/raw/gh-pages/Angela/DataWorkshop_Sharing.pptx)
 
 # Version Control
 
