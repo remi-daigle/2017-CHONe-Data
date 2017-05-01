@@ -23,32 +23,6 @@ render(input = 'shocknawe.rmd', 'all')
 
 
 
-<!-- ## Structure of document
-
-Get people acquainted with existing possibilities in R from environmental point of view and oceanographic point of view
-
-Structure for shock and awe portion 1.
-Ecologically describe a study area from available open source data
-
-1. Define study area
-2.
-
-- SDM
-- Species interactions
-- Environmental data
-- Go look at ropensci
-- wordcloud2
-
-4. How about it's phylogeny?
-
-    install.package('brranching')
-
-
-Now that we have a pretty thorough description of the species, what else could we find out. How about known occurrence in our study area
-
-
-How about fisheries activity?
-install.package('rfisheries') -->
 
 <!--
 library(sp) ; library(mapview)
@@ -275,7 +249,7 @@ ggplot() +
              expand = F)
 ```
 
-## Overlay your species occurrences over the base map
+### Overlay your species occurrences over the base map
 
 You can now overlay your species occurrences on your base map!
 
@@ -297,6 +271,24 @@ OBIS <- st_as_sf(OBIS,
                  ylim = c(latmin-x,latmax+x),
                  expand = F)
 ```
+
+### Interactive maps
+
+R also allows you to create interactive maps in html (web browser) using packages `mapview` and `leaflet` that can easily be used with multiple other packages (*i.e.* `shiny` and `rmarkdown`). See this [post](http://environmentalinformatics-marburg.github.io/mapview/popups/html/popups.html) for a more extensive presentation of how these can be used.
+
+```{r, leaflet}
+OBIS <- read.csv("./OBIS.csv")
+proj <- "+proj=longlat +datum=WGS84"
+OBISpt <- sp::SpatialPointsDataFrame(coords = OBIS[, c("decimalLongitude", "decimalLatitude")], data = OBIS, proj4string = CRS(proj), match.ID = TRUE)
+
+mapview::mapview(OBISpt, cex = 4)
+
+leaflet::leaflet() %>%
+  leaflet::addTiles() %>%
+  leaflet::addCircleMarkers(data = OBISpt, popup = popupTable(OBISpt, zcol = c("species", "yearcollected")))
+```
+
+[Here](https://letir.github.io/Elections_fr-042017/) is another example with the the results of the first round of this year's French elections for French people voting outside of the country.
 
 ## Environmental variables
 
