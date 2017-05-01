@@ -9,8 +9,67 @@ output:
     toc_float: yes
 ---
 [<<BACK](https://remi-daigle.github.io/2017-CHONe-Data/)
+# Data repositories
 
-Angela: review of data repositories (zenodo, figshare, dryad, OBIS, 
+Please Download:
+
+[PDF](https://github.com/remi-daigle/2017-CHONe-Data/raw/gh-pages/Angela/DataWorkshop_Metadata.pdf)
+
+[PPT](https://github.com/remi-daigle/2017-CHONe-Data/raw/gh-pages/Angela/DataWorkshop_Metadata.pptx)
+
+# Version Control
+
+## What is version control?
+
+Version control is a framework by which by which you can track changes to a file, of set of files. We are essentially trying to avoid this:
+
+![via PhD comics (http://phdcomics.com/comics/archive.php?comicid=1531)](http://www.phdcomics.com/comics/archive/phd101212s.gif)
+
+And we're aiming to nudge you along a little further than this:
+
+![via XKCD (https://xkcd.com/1597/)](https://imgs.xkcd.com/comics/git.png)
+
+But, like most XKCD comics, it contains some serious wisdom.
+
+While there are other version control system out there, in our opinion Git & Github seem to have the best combination of features for scientists. However, if you wish to use a different version control system, go for it, many of the concepts we're learning about here will be transferable.
+
+First a quick clarification about the tools we are using:
+
+- [Git](https://git-scm.com/) is a free and open source distributed version control system designed to handle everything from small to very large projects with speed and efficiency.
+- [GitHub](https://github.com/) Online project hosting using Git. Includes source-code browser, in-line editing, wikis, and ticketing. Free for public open-source code.
+- [GitHub Desktop App](https://desktop.github.com/) GitHub Desktop is a seamless way to contribute to projects on GitHub
+
+So Git is the protocol that we are using to do the actual version control (on our computer) and we are hosting our project on GitHub (the website) so we can keep a backup in the cloud and share our work (both in terms of housing all the code, but also for hosting your own websites). Finally, we are using the GitHub Desktop App to allow us to sync our local files to the GitHub website
+
+## How does version control work?
+
+Version control systems start with a base version of the document and then save just the changes you made at each step of the way. You can think of it as a tape: if you rewind the tape and start at the base document, then you can play back each change and end up with your latest version.
+
+[Changes Are Saved Sequentially](http://swcarpentry.github.io/git-novice/fig/play-changes.svg)
+
+Once you think of changes as separate from the document itself, you can then think about “playing back” different sets of changes onto the base document and getting different versions of the document. For example, two users can make independent sets of changes based on the same document.
+
+[Different Versions Can be Saved](http://swcarpentry.github.io/git-novice/fig/versions.svg)
+
+If there aren’t conflicts, you can even play two sets of changes onto the same base document.
+
+[Multiple Versions Can be Merged](http://swcarpentry.github.io/git-novice/fig/merge.svg)
+
+A version control system is a tool that keeps track of these changes for us and helps us version and merge our files. It allows you to decide which changes make up the next version, called a commit, and keeps useful metadata about them. The complete history of commits for a particular project and their metadata make up a repository. Repositories can be kept in sync across different computers facilitating collaboration among different people.
+
+## How to use version control
+
+By default git 'watches' not just a single file; rather, it looks for changes in any file in an entire directory (except those identified in the .gitignore). So I tend to set it up in a way that makes git watch the whole project directory (i.e. the folder that contains the .Rproj file)
+
+While we can create a new 
+
+
+
+https://xkcd.com/1296/
+
 Remi/David: version control, student builder pack, Github)
+
+# Putting it all together
+rmd and github pages
 
 [<<BACK](https://remi-daigle.github.io/2017-CHONe-Data/)

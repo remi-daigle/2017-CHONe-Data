@@ -10,4 +10,9 @@ output:
     toc: yes
     toc_float: yes
 ---
-what is it, standards, Gis, DCT... ) Angela
+
+Please Download:
+
+[PDF](https://github.com/remi-daigle/2017-CHONe-Data/raw/gh-pages/Angela/DataWorkshop_Metadata.pdf)
+
+[PPT](https://github.com/remi-daigle/2017-CHONe-Data/raw/gh-pages/Angela/DataWorkshop_Metadata.pptx)
