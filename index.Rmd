@@ -40,7 +40,7 @@ Participants must bring a laptop with a Mac, Linux, or Windows operating system 
  
 | May 2 | *Four Points Gatineau, Renaissance B, 4th Floor*  |
 |--------|-------------------------------------------------------------------------|
-|8:30 AM - Noon | - [R Markdown and notebooks](https://remi-daigle.github.io/2017-CHONe-Data/Rmarkdown.nb.html) <br> - [Shock and awe with R](https://remi-daigle.github.io/2017-CHONe-Data/shocknawe.nb.html) <br> - [Text analysis](https://remi-daigle.github.io/2017-CHONe-Data/text.nb.html) <br> - [Data Analysis and Visualization in R](https://remi-daigle.github.io/2017-CHONe-Data/dataviz.nb.html) |
+|9 AM - Noon | - [R Markdown and notebooks](https://remi-daigle.github.io/2017-CHONe-Data/Rmarkdown.nb.html) <br> - [Shock and awe with R](https://remi-daigle.github.io/2017-CHONe-Data/shocknawe.nb.html) <br> - [Text analysis](https://remi-daigle.github.io/2017-CHONe-Data/text.nb.html) <br> - [Data Analysis and Visualization in R](https://remi-daigle.github.io/2017-CHONe-Data/dataviz.nb.html) |
 |Noon - 1 PM | - Lunch |
 | 1 - 5 | - [Data Archiving & Version Control](https://remi-daigle.github.io/2017-CHONe-Data/versioncontrol.nb.html) |
 | evening | - Hacky Hour (location TBD) |
