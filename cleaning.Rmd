@@ -548,4 +548,23 @@ install.packages('scales') # Graphical scales map data to aesthetics
 library(tidyverse)
 ```
 
+## Keeping R up to date
+
+Every so often, R releases a new update. Many of you had install issues last night that were resolved by installing the newest version of R. To keep things running smoothly in the future, here is a great trick:
+
+```{r, eval=FALSE}
+# install the package called installr
+install.packages("installr")
+
+# load the library
+library(installr)
+
+# run the updater function (this is best done outside Rstudio in the R gui)
+updater()
+
+```
+
+This will prompt you to install the latest version of R and copy over all of you packages if you choose to do so (the alternative is installing them all by hand again), and it can also update your packages for you. It's really a great time saver!
+
+
 [<<BACK](https://remi-daigle.github.io/2017-CHONe-Data/)
