@@ -8,29 +8,10 @@ output:
     toc: yes
     toc_float: yes
 ---
+
 [<<BACK](https://remi-daigle.github.io/2017-CHONe-Data/)
 
 (Remi/David)
-
-<!--
-
-rm(list=ls())
-setwd('/Users/davidbeauchesne/dropbox/phd/misc/2017-chone-data/2017-chone-data/')
-library(rmarkdown)
-render(input = 'shocknawe.rmd', 'all')
-
--->
-
-
-
-
-<!--
-library(sp) ; library(mapview)
-pnt <- SpatialPoints(coords = data.frame(x = 174.764474, y = -36.877245), proj4string = CRS('+init=epsg:4326'))
-mapview(pnt, popup = mapview:::popupIframe("https://www.youtube.com/embed/iApz08Bh53w?autoplay=1", width = 300, height = 225))
- -->
-
-
 
 ```{r, message=FALSE}
 library(sf)
@@ -40,15 +21,13 @@ library(tidyverse)
 library(ggplot2)
 ```
 
+This portion of the workshop is dedicated to providing an overview of possibilities using R. This section is by no means an exhaustive presentation of what is possible in R. At this point, it would be impossible (read *very very hard for us*) to provide such an exhaustive overview. The R community is fast growing and dynamic, so much so that new packages and ways to use them are posted every day all over the web. This portion of the workshop is therefore a biologist's perspective on what you could do if you wish to use R for something else than stats analyses.
 
+Keep in mind: **If you can imagine it, someone probably has before you and chances are it's already implemented and available under some sort of function or package in R**.
 
-This portion of the workshop is dedicated to providing an overview of possibilities using R. This section is by no means an exhaustive presentation of what is possible in R. At this point, it would be impossible (read *very very hard for us*) to provide such an exhaustive overview. The R community is fast growing and dynamic, so much so that new packages and ways to use them are posted every day all over the web. This portion of the workshop is therefore rather a biologist's perspective on what you could do if you wish to use R for something else than stats analyses.
+With that in mind, here is a list (not ordered with any sort of priority or relevance) of a few resources we are regularly using to keep on top of new developments and to search for help in achieving whatever it is we imagine we could do. Use it!
 
-Keep in mind: *If you can imagine it, someone probably has before you and chances are it's already implemented and available under some sort of function or package in R*.
-
-With that in mind, here is a list (not ordered with any sort of priority or relevance) of a few resources from which we are regularly using to keep on top of new developments and to search for help achieving whatever it is we imagine we could do. Use it abundantly!
-
-- [ROpenSci](https://ropensci.org/)
+- [ROpenSci](https://ropensci.org/) (you would be right in assuming that a fair number of packages presented in this section were developed by the ROpenSci team)
 - [RBloggers](https://www.r-bloggers.com/)
 - [Stack overflow](http://stackoverflow.com/)
 - [DataCamp](https://www.datacamp.com)
@@ -63,44 +42,39 @@ Let's imagine that you are interested in a species in a given area and wish to k
 ## Defining species and area of interest
 
 ```{r, params}
-    # Let's select Atlantic cod as our species of interest
-    sp <- 'Gadus morhua'
+# Let's select Atlantic cod as our species of interest
+sp <- 'Gadus morhua'
 
-    # And the gulf of St. Lawrence as our study area
-    #define the corners
-    latmax <- 52.01312
-    latmin <- 45.52399
-    lonmax <- -55.73636
-    lonmin <- -71.06333
-    #
-    # latmax <- 46.25
-    # latmin <- 45.5
-    # lonmax <- -61.25
-    # lonmin <- -62.25
+# And the gulf of St. Lawrence as our study area
+#define the corners
+latmax <- 52.01312
+latmin <- 45.52399
+lonmax <- -55.73636
+lonmin <- -71.06333
 ```
 
 ## Describe your species
 
-### Fishbase <!-- and Reol? -->
+### Fishbase
 
 We'll start with a description of the species. First, let's see what [fishbase](http://www.fishbase.ca/) has to offer. This online data repository, along with [sealifebase](http://www.sealifebase.org/), contains a lot of information on marine and aquatic species all over the world and is accessible through the `package [rfishbase](https://github.com/ropensci/rfishbase)`
 
 <!-- Reol, install.packages('reol') -->
 
 ```{r, ecology, eval = TRUE}
-    # Let's have a look at the information available our species ecology
-    ecol <- rfishbase::ecology(sp)
-    ecol <- cbind(colnames(ecol), t(ecol))
-    rownames(ecol) <- NULL
-    ecol <- ecol[ecol[,2] != 0, ] # remove 0
-    ecol <- ecol[!is.na(ecol[,2]), ] # remove NAs
+# Let's have a look at the information available on our species ecology
+ecol <- rfishbase::ecology(sp)
+ecol <- cbind(colnames(ecol), t(ecol))
+rownames(ecol) <- NULL
+ecol <- ecol[ecol[,2] != 0, ] # remove 0
+ecol <- ecol[!is.na(ecol[,2]), ] # remove NAs
 
-    knitr::kable(ecol, col.names = c('Descriptors', 'Attributes'))
+knitr::kable(ecol, col.names = c('Descriptors', 'Attributes'))
 ```
 
 ### Taxize
 
-We can also get it's taxonomy rather easily. The package [taxize](https://ropensci.org/tutorials/taxize_tutorial.html) allows you to extract and validate, among other things, the taxonomy of millions of species by accessing an important number of online databases accessible through their Application program interface (API).
+We can also extract taxonomic informations rather easily. The package [taxize](https://ropensci.org/tutorials/taxize_tutorial.html) allows you to extract and validate, among other things, the taxonomy of millions of species by accessing an important number of online databases accessible through their Application Program Interface (API).
 
 - Encyclopedia of Life (EOL) eol
 - axonomic Name Resolution Service tnrs
@@ -127,19 +101,19 @@ We can also get it's taxonomy rather easily. The package [taxize](https://ropens
 - NatureServe
 
 ```{r, taxonomy, eval = TRUE}
-    # Start by exporting the taxonomy of our species
-        taxo <- taxize::classification(sp, db = 'worms', verbose = FALSE)
-        taxo[[1]]
+# Start by exporting the taxonomy of our species
+    taxo <- taxize::classification(sp, db = 'worms', verbose = FALSE)
+    taxo[[1]]
 
-    # We can also extract the common or scientific names using sci2comm() & comm2sci(), respectively.
-        taxize::sci2comm(sp, db = 'itis')
+# We can also extract the common or scientific names using sci2comm() & comm2sci(), respectively.
+    taxize::sci2comm(sp, db = 'itis')
 
-    # Or find out whether there are other names under which the species is known
-        taxize::synonyms(sp, db = 'itis')
+# Or find out whether there are other names under which the species is known
+    taxize::synonyms(sp, db = 'itis')
 
-    # Another really interesting feature is to extract all known species at a given taxonomic scale.
-    # Let's take the genus level and see the first 20 species that are part of that genus on the itis database
-        taxize::children(strsplit(sp, ' ')[[1]][1], db = 'itis')[[1]]
+# Another really interesting feature is to extract all known species at a given taxonomic scale.
+# Let's take the genus level and see the first 20 species that are part of that genus on the itis database
+    taxize::children(strsplit(sp, ' ')[[1]][1], db = 'itis')[[1]]
 ```
 
 ### GloBI
@@ -147,17 +121,17 @@ We can also get it's taxonomy rather easily. The package [taxize](https://ropens
 How about extracting all known preys and predators of the species of interest? The [Global Biotic Interactions](http://globalbioticinteractions.org) web platform contains thousands of empirical binary interactions for multiple types of interactions, all over the world, and is easily accessible using the package [rglobi](https://github.com/ropensci/rglobi).
 
 ```{r, trophic, eval = TRUE}
-    # There are multiple types of interactions available on GloBI
-        rglobi::get_interaction_types()[,1:3]
+# There are multiple types of interactions available on GloBI
+    rglobi::get_interaction_types()[,1:3]
 
-    # For now let's focus on predator-prey interactions
-        prey <- rglobi::get_prey_of(sp)$target_taxon_name
-        pred <- rglobi::get_predators_of(sp)$target_taxon_name
-        prey
-        pred
+# For now let's focus on predator-prey interactions
+    prey <- rglobi::get_prey_of(sp)$target_taxon_name
+    pred <- rglobi::get_predators_of(sp)$target_taxon_name
+    length(prey)
+    length(pred)
+    prey[1:20]
+    pred[1:20]
 ```
-
-<!-- Add d3 object or igraph object? -->
 
 ## Make your search spatially explicit
 
@@ -165,17 +139,16 @@ How about extracting all known preys and predators of the species of interest? T
 
 OBIS is the [Ocean Biogeographic Information System](http://www.iobis.org/) and their vision is: "To be the most comprehensive gateway to the world’s ocean biodiversity and biogeographic data and information required to address pressing coastal and world ocean concerns."
 
- We can get access to their HUGE database through the excellent `robis` package by [ropensci](https://ropensci.org/) (unsurprisingly, they also have other great open science R packages, from which this whole section is highly inspired)
+ We can get access to their HUGE database through the excellent `robis` package by [ropensci](https://ropensci.org/)
 
 
 ```{r, OBIS data, eval=FALSE}
-    sf::st_as_text(bb$geometry)
-    OBIS <- robis::occurrence(scientificname = sp, geometry=st_as_text(bb$geometry), startdate = as.Date("2010-01-01"), enddate = as.Date("2017-01-01"), fields = c("species", "yearcollected","decimalLongitude", "decimalLatitude"))
+OBIS <- robis::occurrence(scientificname = sp, geometry=st_as_text(bb$geometry), startdate = as.Date("2010-01-01"), enddate = as.Date("2017-01-01"), fields = c("species", "yearcollected","decimalLongitude", "decimalLatitude"))
 
-    # remove duplicates
-        OBIS <- unique(OBIS)
+# remove duplicates
+    OBIS <- unique(OBIS)
 
-    write.csv(OBIS,'obis.csv',row.names = FALSE)
+write.csv(OBIS,'obis.csv',row.names = FALSE)
 ```
 
 ### Visualize data
@@ -195,20 +168,21 @@ Let's start by defining a bounding box for your study site:
 
 ```{r, bounding box, eval = TRUE}
 #create a matrix
-bbmat <- cbind(
-            c(lonmin,lonmax,lonmax,lonmin,lonmin),
-            c(latmin,latmin,latmax,latmax,latmin)
-        )
+    bbmat <- cbind(c(lonmin,lonmax,lonmax,lonmin,lonmin),
+                   c(latmin,latmin,latmax,latmax,latmin)
+                   )
 # make the matrix a 'simple features' polygon
-bbsf <- st_polygon(list(bbmat))
+    bbsf <- st_polygon(list(bbmat))
+
 # and let's give it information about the projection:
-bbsfc <- st_sfc(bbsf,crs="+proj=longlat +datum=WGS84")
+    bbsfc <- st_sfc(bbsf,crs="+proj=longlat +datum=WGS84")
+
 # finally, let's make it a simple features data.frame
-bb <- st_sf(name="Study Site",geometry=bbsfc)
-str(bb)
+    bb <- st_sf(name="Study Site",geometry=bbsfc)
+    str(bb)
 
 # plot it!
-ggplot(bb) + geom_sf()
+    ggplot(bb) + geom_sf()
 ```
 
 ### Add a basemap!
@@ -235,9 +209,8 @@ plot.bathy(bathymetry,
 # convert from bathy to raster to 'sp' polygon to simple features
 # bathypoly <- marmap::as.raster(bathymetry) %>%
     # rasterToPolygons() %>% st_as_sf
-bathyras <- fortify.bathy(bathymetry)
-
-bathyras$z[bathyras$z>0] <- NA
+    bathyras <- fortify.bathy(bathymetry)
+    bathyras$z[bathyras$z>0] <- NA
 
 x=0.2
 ggplot() +
@@ -261,15 +234,15 @@ OBIS <- st_as_sf(OBIS,
     filter(!is.na(species))
 
 
-    ggplot(OBIS) +
-        geom_raster(data=bathyras,aes(x=x,y=y,fill=z))+
-        geom_sf(data=bb,fill="transparent",colour='yellow',size=2)+
-        # geom_sf(data=Canada,fill='grey40')+
-        geom_point(data=OBIS,aes(x=decimalLongitude,y=decimalLatitude))+
-        facet_wrap(~species)+
-        coord_sf(xlim = c(lonmin-x,lonmax+x),
-                 ylim = c(latmin-x,latmax+x),
-                 expand = F)
+ggplot(OBIS) +
+    geom_raster(data=bathyras,aes(x=x,y=y,fill=z))+
+    geom_sf(data=bb,fill="transparent",colour='yellow',size=2)+
+    # geom_sf(data=Canada,fill='grey40')+
+    geom_point(data=OBIS,aes(x=decimalLongitude,y=decimalLatitude))+
+    facet_wrap(~species)+
+    coord_sf(xlim = c(lonmin-x,lonmax+x),
+             ylim = c(latmin-x,latmax+x),
+             expand = F)
 ```
 
 ### Interactive maps
@@ -281,130 +254,118 @@ OBIS <- read.csv("./OBIS.csv")
 proj <- "+proj=longlat +datum=WGS84"
 OBISpt <- sp::SpatialPointsDataFrame(coords = OBIS[, c("decimalLongitude", "decimalLatitude")], data = OBIS, proj4string = CRS(proj), match.ID = TRUE)
 
-mapview::mapview(OBISpt, cex = 4)
-
-leaflet::leaflet() %>%
-  leaflet::addTiles() %>%
-  leaflet::addCircleMarkers(data = OBISpt, popup = popupTable(OBISpt, zcol = c("species", "yearcollected")))
+mapview::mapview(OBISpt, cex = 4)@map
 ```
 
 [Here](https://letir.github.io/Elections_fr-042017/) is another example with the the results of the first round of this year's French elections for French people voting outside of the country.
 
 ## Environmental variables
 
-There are also multiple resources to access environmental data. As seen before, we can easily access bathymetry data using the marmap package. Other environmental data can also be accessed using other packages like `raster` for terrestrial climatic data and `rnoaa`
+There are also multiple resources to access environmental data. As seen before, we can easily access bathymetry data using the marmap package. Other environmental data can also be accessed using other packages like `raster` for terrestrial climatic data and `rnoaa` for some environmental layers like sea surface temperature et sea ice cover.
 
 ### Extract sea surface temperature (SST)
 
 ```{r, NOAA, eval = TRUE}
-    # Bear with us, for simplicity's sake we will only take one year of data for one month, knowing very well that this does not make sense ecologically!
-    # Eventually use apply() to load multiple datasets and create rasterStack
-        # An exemple with sea ice
-            # urls <- seaiceeurls(mo='Apr', pole='N')[1:10]
-            # out <- lapply(urls, seaice)
-            # names(out) <- seq(1979,1988,1)
-            # df <- ldply(out)
-            # library('ggplot2')
-            # ggplot(df, aes(long, lat, group=group)) +
-            # geom_polygon(fill="steelblue") +
-            # theme_ice() +
-            # facet_wrap(~ .id)
+# Bear with us, for simplicity's sake we will only take one year of data for one month, knowing very well that this does not make sense ecologically!
+# Eventually use apply() to load multiple datasets and create rasterStack
+    sst.nc <- rnoaa::ersst(2010, 8, overwrite = TRUE)
+    sst <- raster(sst.nc$filename, varname = 'sst')
+    sst@data@values <- values(sst) # make sure values are in the right data slot
 
-        sst.nc <- rnoaa::ersst(2010, 8, overwrite = TRUE)
-        sst <- raster(sst.nc$filename, varname = 'sst')
-        sst@data@values <- values(sst) # make sure values are in the right data slot
+    # never do that...
+    sst@extent@xmin <- sst@extent@xmin - 361
+    sst@extent@xmax <- sst@extent@xmax - 361
 
-        # never do that...
-        sst@extent@xmin <- sst@extent@xmin - 361
-        sst@extent@xmax <- sst@extent@xmax - 361
+# Transform rasterLayer as a data.frame
+    sst.spdf <- as(sst, "SpatialPixelsDataFrame")
+    sst.df <- as.data.frame(sst.spdf)
+    colnames(sst.df) <- c('sst','x','y')
 
-    # Transform rasterLayer as a data.frame
-        sst.spdf <- as(sst, "SpatialPixelsDataFrame")
-        sst.df <- as.data.frame(sst.spdf)
-        colnames(sst.df) <- c('sst','x','y')
-
-    # Plot newly acquired data!
-        ggplot(sst.df, aes(x=x, y=y)) +
-            geom_tile(aes(x=x,y=y,fill=sst)) +
-            coord_equal()
-
+# Plot newly acquired data!
+    ggplot(sst.df, aes(x=x, y=y)) +
+        geom_tile(aes(x=x,y=y,fill=sst)) +
+        coord_equal()
 ```
 
 ## Species distribution models
 
-Now what we can do once we have species occurrence data and environmental variables are species distribution models (SDMs). There are multiple ways and packages to perform SDMs and this [vignette](https://cran.r-project.org/web/packages/dismo/vignettes/sdm.pdf) provides an extensive overview of the different methods available. For this workshop, we will be using the `package biomod2`, which implements most of the methods presented in the vignette. There is also a thorough explanation of our to use biomod2 in another very interesting [vignette](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/pkg/biomod2/inst/doc/Simple_species_modelling.pdf?root=biomod)
+Now what we can do once we have species occurrence data and environmental variables are species distribution models (SDMs). There are multiple ways and packages to perform SDMs and this [vignette](https://cran.r-project.org/web/packages/dismo/vignettes/sdm.pdf) provides an extensive overview of the different methods available. For this workshop, we will be using the package `biomod2`, which implements most of the methods presented in the vignette. There is also a thorough explanation of our to use `biomod2` in another very interesting [vignette](https://r-forge.r-project.org/scm/viewvc.php/*checkout*/pkg/biomod2/inst/doc/Simple_species_modelling.pdf?root=biomod)
 
 
 ### Formating data
 
-The first thing to do is to format our data to be able to work with biomod2 functions, which work with BIOMOD.formated.data.PA class objects. This entails stacking all of our environmental data together to perform analyses.
+The first thing to do is to format our data to be able to work with `biomod2` functions, which work with BIOMOD.formated.data.PA class objects. This entails stacking all of our environmental data together to perform analyses.
 
 ```{r, envCov}
+# Create raster stack with environmental variables
+# raster have to be of similar extent and resolution
+# Load bathy data from marmap as raster
+    bathypoly <- marmap::as.raster(bathymetry)
+    bathypoly@data@values[bathypoly@data@values > 0] <- NA
 
-    # Create raster stack with environmental variables
-    # raster have to be of similar extent and resolution
-        # Load bathy data from marmap as raster
-            bathypoly <- marmap::as.raster(bathymetry)
-            bathypoly@data@values[bathypoly@data@values > 0] <- NA
+# Resample sst to make it same extent as bathypoly
+    # create empty raster with appropriate resolution and extent
+        sst2 <- raster(resolution = res(bathypoly), ext = extent(bathypoly), crs=bathypoly@crs)
+    # Beware, this may not be good practice because we are changing the resolution of the data to a finer resolution!
+        sst2 <- resample(sst, sst2, method='bilinear') # extract data from sst
 
-        # Resample sst to make it same extent as bathypoly
-            # create empty raster with appropriate resolution and extent
-                sst2 <- raster(resolution = res(bathypoly), ext = extent(bathypoly), crs=bathypoly@crs)
-            # Beware, this may not be good practice because we are changing the resolution of the data to a finer resolution!
-                sst2 <- resample(sst, sst2, method='bilinear') # extract data from sst
+# Create raster stack
+    envCov <- raster::stack(bathypoly, sst2)
 
-        # Create raster stack
-            envCov <- raster::stack(bathypoly, sst2)
-
-        plot(envCov)
+# Plot it !
+    plot(envCov)
 ```
 
-You can then create your biomod2 data class.
+You can then create your `biomod2` data class...
 
 ```{r, SDM data}
-    OBIS <- read.csv("obis.csv")
-    SDMdata <- biomod2::BIOMOD_FormatingData(resp.var = rep(1,nrow(OBIS)),
-                                            expl.var = envCov,
-                                            resp.xy = OBIS[, c("decimalLongitude","decimalLatitude")],
-                                            resp.name = sp,
-                                            PA.nb.rep = 2)
-    SDMdata
-    plot(SDMdata)
+OBIS <- read.csv("obis.csv")
+SDMdata <- biomod2::BIOMOD_FormatingData(resp.var = rep(1,nrow(OBIS)),
+                                        expl.var = envCov,
+                                        resp.xy = OBIS[, c("decimalLongitude","decimalLatitude")],
+                                        resp.name = sp,
+                                        PA.nb.rep = 2)
+SDMdata
+plot(SDMdata)
 ```
 
-You can then use this object with the biomod2 functions are generate a distribution model for your species of interest.
+<br/>
+
+...and use this object with the `biomod2` functions are generate a distribution model for your species of interest.
 
 ```{r, SDM model}
-    # Basic options for modelling
-        SDMoption <- biomod2::BIOMOD_ModelingOptions()
+# Basic options for modelling
+    SDMoption <- biomod2::BIOMOD_ModelingOptions()
 
-    # SDM model
-        SDM <- biomod2::BIOMOD_Modeling(data = SDMdata,
-                                        models = "MAXENT.Tsuruoka",
-                                        model.options = SDMoption)
+# SDM model
+    SDM <- biomod2::BIOMOD_Modeling(data = SDMdata,
+                                    models = "MAXENT.Tsuruoka",
+                                    model.options = SDMoption)
 
-    # Print model summary
-        SDM
+# Print model summary
+    SDM
 
-    # print the dimnames of this object to understand the structure of the returned objects
-        dimnames(SDM)
+# print the dimnames of this object to understand the structure of the returned objects
+    dimnames(SDM)
 
-    # get all models evaluation.
-    # These give you an evaluation of the performance of your model.
-        biomod2::get_evaluations(SDM)
+# get all models evaluation.
+# These give you an evaluation of the performance of your model.
+    biomod2::get_evaluations(SDM)
 
-    # Finally, once the models are calibrated and evaluated, you can project your species spatial distribution...
-        SDMproj <- biomod2::BIOMOD_Projection(modeling.output = SDM,
-                                              new.env = envCov,
-                                              proj.name = 'Awesome!',
-                                              selected.models = 'all',
-                                              binary.meth = 'TSS',
-                                              compress = 'xz',
-                                              clamping.mask = F,
-                                              output.format = '.grd')
-    # ... and visualize them!                
-        plot(SDMproj)
+# Finally, once the models are calibrated and evaluated, you can project your species spatial distribution...
+    SDMproj <- biomod2::BIOMOD_Projection(modeling.output = SDM,
+                                          new.env = envCov,
+                                          proj.name = 'Awesome!',
+                                          selected.models = 'all',
+                                          binary.meth = 'TSS',
+                                          compress = 'xz',
+                                          clamping.mask = F,
+                                          output.format = '.grd')
+# ... and visualize them!                
+    plot(SDMproj)
 ```
+
+<br/>
 
 Riveting! We starting with a basic idea and ended up with a species description, an idea of the distribution of certain environmental parameters in our area of interest (could be better, we know!) and the potential spatial distribution of our species!
 
@@ -427,62 +388,80 @@ The reality is, there is so much more going on in our area of interest than the 
 <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
 
+<br/>
 
 ## Community level analyses
 
-One of the usual challenges in ecology is to perform analyses at the community scale often due to the difficulty of sampling multiple species in a single system. The reality is that our species of interest is very likely to interact and be impacted by other species.
+One of the usual challenge in ecology is to perform analyses at the community scale often due to the difficulty of sampling multiple species in a single system. The reality is that our species of interest is very likely to interact and be impacted by other species.
+
+<br/>
 
 ### Extract all occurrence known occurrence data in area of interest
 
 OBIS once again gives us the opportunity to access multiple species occurrences. Let's go back to OBIS and extract every available data in our system.
 
 ```{r, multi species OBIS, eval = FALSE}
-    # Load all known species occurrences from our area of interest
-        multiOBIS <- robis::occurrence(geometry=st_as_text(bb$geometry), startdate = as.Date("2010-01-01"), enddate = as.Date("2017-01-01"), fields = c("species", "yearcollected","decimalLongitude", "decimalLatitude"))
-        multiOBIS <- multiOBIS[!is.na(multiOBIS[,'species']), ] # remove species == NA
+# Load all known species occurrences from our area of interest
+    multiOBIS <- robis::occurrence(geometry=st_as_text(bb$geometry), startdate = as.Date("2010-01-01"), enddate = as.Date("2017-01-01"), fields = c("species", "yearcollected","decimalLongitude", "decimalLatitude"))
+    multiOBIS <- multiOBIS[!is.na(multiOBIS[,'species']), ] # remove species == NA
 
-    # Remove duplicates
-        multiOBIS <- unique(multiOBIS)
+# Remove duplicates
+    multiOBIS <- unique(multiOBIS)
 
-    # Select species for which there is at least n observations
-        n = 50
-        spOK <- names(which(table(multiOBIS[,'species']) >= n)) # id of species with at least n observations
-        multiOBIS <- multiOBIS[multiOBIS[, 'species'] %in% spOK, ] # Subset of multiOBIS data with species with at least n observations
-        multiOBIS[,'species'] <- as.factor(multiOBIS[,'species'])
-        multiOBIS[,'yearcollected'] <- as.factor(multiOBIS[,'yearcollected'])
-        write.csv(multiOBIS,'multiOBIS.csv',row.names = FALSE)
+# Select species for which there is at least n observations
+    n = 50
+    spOK <- names(which(table(multiOBIS[,'species']) >= n)) # id of species with at least n observations
+    multiOBIS <- multiOBIS[multiOBIS[, 'species'] %in% spOK, ] # Subset of multiOBIS data with species with at least n observations
+    multiOBIS[,'species'] <- as.factor(multiOBIS[,'species'])
+    multiOBIS[,'yearcollected'] <- as.factor(multiOBIS[,'yearcollected'])
+    write.csv(multiOBIS,'multiOBIS.csv',row.names = FALSE)
 ```
+
+<br/>
 
 ```{r, multiOBISPlot, eval = T}
+# Read occurrence data file
+    multiOBIS <- read.csv("multiOBIS.csv")
 
-    # Read occurrence data file
-        multiOBIS <- read.csv("multiOBIS.csv")
+# Structure of object
+    str(multiOBIS)
 
-    # Structure of object
-        str(multiOBIS)
+# Species list
+    spList <- unique(multiOBIS[,'species'])
+    length(spList)
 
-    # Visualize species list
-        spList <- unique(multiOBIS[,'species'])
-        length(spList)
-        spList
+# Plot
+    multiOBIS <- sf::st_as_sf(multiOBIS,
+                     coords = c("decimalLongitude", "decimalLatitude"),
+                     crs="+proj=longlat +datum=WGS84",
+                     remove=FALSE) %>%
+        filter(!is.na(species))
 
-    # Plot
-        multiOBIS <- sf::st_as_sf(multiOBIS,
-                         coords = c("decimalLongitude", "decimalLatitude"),
-                         crs="+proj=longlat +datum=WGS84",
-                         remove=FALSE) %>%
-            filter(!is.na(species))
+    ggplot(multiOBIS) +
+        geom_raster(data=bathyras,aes(x=x,y=y,fill=z))+
+        geom_sf(data=bb,fill="transparent",colour='yellow',size=2)+
+        geom_point(data=multiOBIS,aes(x=decimalLongitude,y=decimalLatitude))+
+        coord_sf(xlim = c(lonmin-x,lonmax+x),
+                 ylim = c(latmin-x,latmax+x),
+                 expand = F)
 
-        ggplot(multiOBIS) +
-            geom_raster(data=bathyras,aes(x=x,y=y,fill=z))+
-            geom_sf(data=bb,fill="transparent",colour='yellow',size=2)+
-            geom_point(data=multiOBIS,aes(x=decimalLongitude,y=decimalLatitude))+
-            coord_sf(xlim = c(lonmin-x,lonmax+x),
-                     ylim = c(latmin-x,latmax+x),
-                     expand = F)
+# mapview again
+    multiOBIS <- read.csv("./multiOBIS.csv")
+    proj <- "+proj=longlat +datum=WGS84"
+    multiOBISpt <- sp::SpatialPointsDataFrame(coords = multiOBIS[, c("decimalLongitude", "decimalLatitude")], data = multiOBIS, proj4string = CRS(proj), match.ID = TRUE)
+
+    mapview::mapviewOptions(maxpoints = 40000)
+    mapview::mapview(multiOBISpt, cex = 4, zcol = 'species')@map
+
 ```
 
+<br/>
+
 ### Trophic network
+
+Using `rglobi` once more, we can extract all known interactions between all species for which we obtained data from OBIS.
+
+<br/>
 
 ```{r, interaction matrix, eval = FALSE}
     nsp <- length(spList)
@@ -501,9 +480,11 @@ OBIS once again gives us the opportunity to access multiple species occurrences.
     saveRDS(foodWeb, file = './foodWeb.rds')
 ```
 
-We can now visualize the network using the package iGraph
+<br/>
 
-```{r, foodWeb iGraph}
+We can now visualize the network using the package iGraph...
+
+```{r, foodWeb}
     nsp <- length(spList)
     foodWeb <- readRDS('./foodWeb.rds')
 
@@ -522,7 +503,11 @@ We can now visualize the network using the package iGraph
       )
 ```
 
-... Not very nice visually when there are too many species. We can however do this better (and more fun!) using the package networkD3
+<br/>
+
+... which does not render well visually when there are too many species. We can however do this better (and more fun!) using the package networkD3
+
+<br/>
 
 ```{r, d3network}
 
@@ -548,155 +533,172 @@ networkD3::forceNetwork(Links = netwD3$links,
 
 ```
 
-Neat huh?!?
+<br/>
 
 ### Co-distribution
 
-We could also evaluate how species are co-distributed using an analysis analog to SDMs, but at the communicty scale and using a hierarchical Bayesian approach, Hierarchical Modeling of Species Communities (HMSC; **ref**) currently being implemented in R in the package `HMSC` (**ref**). As with SDM using the `biomod2` package, the first step is to format the data into a HMSC class object.
+We could also evaluate how species are co-distributed using an analysis analog to SDMs, but at the communicty scale and using a hierarchical Bayesian approach, Hierarchical Modeling of Species Communities (HMSC) currently being implemented in R in the package [`HMSC`](https://github.com/guiblanchet/HMSC). As with SDM using the `biomod2` package, the first step is to format the data into a HMSC class object.
 
-#### Formatting the data
+
+<br/>
 
 ##### Create regular grid over study area
 
 In order to create common observations among individual observations, we will aggregate all data within regular grid cells, so that cells will become planning units on which we base co-distribution of species. We will also create a rather coarse sized grid in order to make processing speed more efficient. Of course there would be more sophisticated ways to do this, but for simplicity's sake we will perform a simple intersect between the grid and occurrence data.
 
+<br/>
+
 ```{r, gridFunction, eval = FALSE}
-    # First create a function to generate hexagonal grids
-        hexGrid <- function(size, shp_over) {
-            library(rgeos)
-            library(sp)
-            shp_over2 <- gBuffer(shp_over, width = size) # buffer so that whole surface of shapefile is covered by a cell
-            spat_grid <- spsample(shp_over2,type="hexagonal",cellsize=size, offset=c(0,0)) # creating points for a hex grid
-            spat_grid <- HexPoints2SpatialPolygons(spat_grid) # creating polygons
-            proj4string(spat_grid) <- proj4string(shp_over) # set projection
-            spat_grid <- spat_grid[shp_over, ] # clipping grid to retain only cells intersecting shapefile
+# First create a function to generate hexagonal grids
+    hexGrid <- function(size, shp_over) {
+        library(rgeos)
+        library(sp)
+        shp_over2 <- gBuffer(shp_over, width = size) # buffer so that whole surface of shapefile is covered by a cell
+        spat_grid <- spsample(shp_over2,type="hexagonal",cellsize=size, offset=c(0,0)) # creating points for a hex grid
+        spat_grid <- HexPoints2SpatialPolygons(spat_grid) # creating polygons
+        proj4string(spat_grid) <- proj4string(shp_over) # set projection
+        spat_grid <- spat_grid[shp_over, ] # clipping grid to retain only cells intersecting shapefile
 
-            id <- paste('ID',seq(1:length(spat_grid)), sep = '')
-            row.names(spat_grid) <- id
-            spat_grid <- SpatialPolygonsDataFrame(Sr = spat_grid, data = data.frame(ID = id, row.names = id))
+        id <- paste('ID',seq(1:length(spat_grid)), sep = '')
+        row.names(spat_grid) <- id
+        spat_grid <- SpatialPolygonsDataFrame(Sr = spat_grid, data = data.frame(ID = id, row.names = id))
 
-            return(spat_grid)
-        }
+        return(spat_grid)
+    }
 
-    # Load shapefile over which grid is made
-        egsl <- rgdal::readOGR(dsn = "./", layer = "egsl")
+# Load shapefile over which grid is made
+    egsl <- rgdal::readOGR(dsn = "./", layer = "egsl")
 
-    # Create grid
-        egsl_grid <- hexGrid(size = 10000, shp_over = egsl)
-        rgdal::writeOGR(egsl_grid, dsn = './', layer = 'egsl_grid', driver="ESRI Shapefile", overwrite_layer=TRUE)
+# Create grid
+    egsl_grid <- hexGrid(size = 10000, shp_over = egsl)
+    rgdal::writeOGR(egsl_grid, dsn = './', layer = 'egsl_grid', driver="ESRI Shapefile", overwrite_layer=TRUE)
 
-    # Plot grid
-        plot(egsl_grid)
+# Plot grid
+    plot(egsl_grid)
 ```
+
+<br/>
 
 ```{r, plotGrid, eval = TRUE, message = FALSE}
-    # Plot grid
-        egsl_grid <- rgdal::readOGR(dsn = "./", layer = "egsl_grid")
-        proj <- "+proj=longlat +datum=WGS84"
-        egsl_grid <- sp::spTransform(egsl_grid, CRSobj = CRS(proj))
-        plot(egsl_grid)
+# Plot grid
+    egsl_grid <- rgdal::readOGR(dsn = "./", layer = "egsl_grid")
+    proj <- "+proj=longlat +datum=WGS84"
+    egsl_grid <- sp::spTransform(egsl_grid, CRSobj = CRS(proj))
+    plot(egsl_grid)
 ```
+
+<br/>
 
 ##### Intersect occurrences and environmental data with grid
 
+<br/>
+
 ```{r, occGrid, eval = TRUE}
-    # reload multiOBIS data and transform into sp points
-        multiOBIS <- read.csv("multiOBIS.csv")
-        proj <- "+proj=longlat +datum=WGS84"
-        multiOBISpt <- sp::SpatialPointsDataFrame(coords = multiOBIS[, c("decimalLongitude", "decimalLatitude")], data = multiOBIS, proj4string = CRS(proj), match.ID = TRUE)
+# reload multiOBIS data and transform into sp points
+    multiOBIS <- read.csv("multiOBIS.csv")
+    proj <- "+proj=longlat +datum=WGS84"
+    multiOBISpt <- sp::SpatialPointsDataFrame(coords = multiOBIS[, c("decimalLongitude", "decimalLatitude")], data = multiOBIS, proj4string = CRS(proj), match.ID = TRUE)
 
-    # Overlay occurrences on grid
-        occGrid <- sp::over(multiOBISpt, egsl_grid)
-        multiOBIS <- cbind(multiOBIS, occGrid)
-        multiOBIS_wide <- reshape2::dcast(multiOBIS, formula = ID ~ species, value.var = 'species', fun.aggregate = length)
+# Overlay occurrences on grid
+    occGrid <- sp::over(multiOBISpt, egsl_grid)
+    multiOBIS <- cbind(multiOBIS, occGrid)
+    multiOBIS_wide <- reshape2::dcast(multiOBIS, formula = ID ~ species, value.var = 'species', fun.aggregate = length)
 
-        for(i in 2:ncol(multiOBIS_wide)) {
-            for(j in 1:nrow(multiOBIS_wide)) {
-                if(multiOBIS_wide[j,i] > 1) multiOBIS_wide[j,i] <- 1
-            }
+    for(i in 2:ncol(multiOBIS_wide)) {
+        for(j in 1:nrow(multiOBIS_wide)) {
+            if(multiOBIS_wide[j,i] > 1) multiOBIS_wide[j,i] <- 1
         }
+    }
 
-        toAdd <- egsl_grid@data[,'ID'][!egsl_grid@data[,'ID'] %in% multiOBIS[,'ID']]
-        matSup <- matrix(nrow = length(toAdd), ncol = ncol(multiOBIS_wide), dimnames = list(c(), colnames(multiOBIS_wide)), data = 0)
-        matSup[,'ID'] <- toAdd
-        multiOBIS_wide <- rbind(multiOBIS_wide, matSup)
-        multiOBIS_wide <- multiOBIS_wide[-which(is.na(multiOBIS_wide[,'ID']) == T), ]
-        egsl_grid@data <- merge(egsl_grid@data, multiOBIS_wide, by = 'ID')
-        spAll <- colnames(egsl_grid@data)[2:ncol(egsl_grid@data)]
-        spID <- seq(1:length(spAll))
-        colnames(egsl_grid@data)[2:ncol(egsl_grid@data)] <- spID
+    toAdd <- egsl_grid@data[,'ID'][!egsl_grid@data[,'ID'] %in% multiOBIS[,'ID']]
+    matSup <- matrix(nrow = length(toAdd), ncol = ncol(multiOBIS_wide), dimnames = list(c(), colnames(multiOBIS_wide)), data = 0)
+    matSup[,'ID'] <- toAdd
+    multiOBIS_wide <- rbind(multiOBIS_wide, matSup)
+    multiOBIS_wide <- multiOBIS_wide[-which(is.na(multiOBIS_wide[,'ID']) == T), ]
+    egsl_grid@data <- merge(egsl_grid@data, multiOBIS_wide, by = 'ID')
+    spAll <- colnames(egsl_grid@data)[2:ncol(egsl_grid@data)]
+    spID <- seq(1:length(spAll))
+    colnames(egsl_grid@data)[2:ncol(egsl_grid@data)] <- spID
 
-    # Extract environmental values from rasters
-        egsl_grid@data <- cbind(egsl_grid@data, raster::extract(bathypoly, egsl_grid, fun = mean, na.rm = T))
-        colnames(egsl_grid@data)[ncol(egsl_grid@data)] <- 'bathy'
-        egsl_grid@data <- cbind(egsl_grid@data, raster::extract(sst2, egsl_grid, fun = mean, na.rm = T))
-        colnames(egsl_grid@data)[ncol(egsl_grid@data)] <- 'sst'
+# Extract environmental values from rasters
+    egsl_grid@data <- cbind(egsl_grid@data, raster::extract(bathypoly, egsl_grid, fun = mean, na.rm = T))
+    colnames(egsl_grid@data)[ncol(egsl_grid@data)] <- 'bathy'
+    egsl_grid@data <- cbind(egsl_grid@data, raster::extract(sst2, egsl_grid, fun = mean, na.rm = T))
+    colnames(egsl_grid@data)[ncol(egsl_grid@data)] <- 'sst'
 
-    # HMSC data
-        studyGrid <- egsl_grid@data
+# HMSC data
+    studyGrid <- egsl_grid@data
 
-        envCov <-  c('bathy','sst')
+    envCov <-  c('bathy','sst')
 
-    # Remove environmental NAs
-        NAs <- studyGrid[, envCov] %>%
-                lapply(X = ., FUN = function(x) which(is.na(x))) %>%
-                unlist(.) %>%
-                unique(.)
-        NAsID <- studyGrid[NAs,'ID']
+# Remove environmental NAs
+    NAs <- studyGrid[, envCov] %>%
+            lapply(X = ., FUN = function(x) which(is.na(x))) %>%
+            unlist(.) %>%
+            unique(.)
+    NAsID <- studyGrid[NAs,'ID']
 
-        studyGrid <- studyGrid[-NAs, ]
+    studyGrid <- studyGrid[-NAs, ]
 ```
+
+<br/>
 
 ##### Create HMSC class data
 
+<br/>
+
 ```{r, HMSC data}
-    # ---------------------------------
-    # Y: sample units by species matrix
-    # ---------------------------------
-        # Extracting only presence/absence data
-            Station <- studyGrid[, 'ID']
-            Y <- studyGrid[, as.character(spID)]
-            rownames(Y) <- Station
+# ---------------------------------
+# Y: sample units by species matrix
+# ---------------------------------
+# Extracting only presence/absence data
+    Station <- studyGrid[, 'ID']
+    Y <- studyGrid[, as.character(spID)]
+    rownames(Y) <- Station
 
-            for(i in 1:ncol(Y)) {
-                Y[,i] <- as.numeric(as.character(Y[,i]))
-            }
+    for(i in 1:ncol(Y)) {
+        Y[,i] <- as.numeric(as.character(Y[,i]))
+    }
 
-    # -----------------------------------------
-    # Pi: sample units by random effects matrix
-    # -----------------------------------------
-        # Create a dataframe for random effects, columns have to be factors
-            Pi <- data.frame(sampling_unit = as.factor(Station))
+# -----------------------------------------
+# Pi: sample units by random effects matrix
+# -----------------------------------------
+# Create a dataframe for random effects, columns have to be factors
+    Pi <- data.frame(sampling_unit = as.factor(Station))
 
-    # ----------------------------------------------------
-    # X: sampling units by environmental covariates matrix
-    # ----------------------------------------------------
-        # Create a matrix for the values of environmental covariates at each sampling unit location
-            X <- matrix(ncol = length(envCov),
-                        nrow = nrow(studyGrid))
-            X <- studyGrid[, envCov]
-                    rownames(X) <- Station
+# ----------------------------------------------------
+# X: sampling units by environmental covariates matrix
+# ----------------------------------------------------
+# Create a matrix for the values of environmental covariates at each sampling unit location
+    X <- matrix(ncol = length(envCov),
+                nrow = nrow(studyGrid))
+    X <- studyGrid[, envCov]
+            rownames(X) <- Station
 
-    # ----------------------------
-    # as.HMSCdata for HMSC package
-    # ----------------------------
-        # Creating HMSC dataset for analyses
-            HMSCdata <- HMSC::as.HMSCdata(Y = Y, X = X, Random = Pi, interceptX = T, scaleX = T)
-            str(HMSCdata)
+# ----------------------------
+# as.HMSCdata for HMSC package
+# ----------------------------
+# Creating HMSC dataset for analyses
+    HMSCdata <- HMSC::as.HMSCdata(Y = Y, X = X, Random = Pi, interceptX = T, scaleX = T)
+    str(HMSCdata)
 ```
+
+<br/>
 
 ##### HMSC analysis
 
 We are now ready to perform the analyses!
 
 ```{r, HMSC model, eval = FALSE}
-    model <- HMSC::hmsc(HMSCdata,
-                        family = "probit",
-                        niter = 10000,
-                        nburn = 100,
-                        thin = 10)
-    saveRDS(model, file = './HMSCmodel.rds')
+model <- HMSC::hmsc(HMSCdata,
+                    family = "probit",
+                    niter = 10000,
+                    nburn = 100,
+                    thin = 10)
+saveRDS(model, file = './HMSCmodel.rds')
 ```
+
+<br/>
 
 ##### HMSC analysis diagnostics
 
@@ -705,95 +707,104 @@ model <- readRDS('./HMSCmodel.rds')
 # =========================================
 # 3. Producing MCMC trace and density plots
 # =========================================
-        mixingMeansParamX <- coda::as.mcmc(model, parameters = "meansParamX")
+    mixingMeansParamX <- coda::as.mcmc(model, parameters = "meansParamX")
 
-    # Trace and density plots to visually diagnose mcmc chains
-    # Another way to check for convergence is to use diagnostic tests such as Geweke's convergence diagnostic (geweke.diag function in coda) and the Gelman and Rubin's convergence diagnostic (gelman.diag function in coda).
-        paramModel <- colnames(mixingMeansParamX)
-        nParam <- length(paramModel)
+# Trace and density plots to visually diagnose mcmc chains
+# Another way to check for convergence is to use diagnostic tests such as Geweke's convergence diagnostic (geweke.diag function in coda) and the Gelman and Rubin's convergence diagnostic (gelman.diag function in coda).
+    paramModel <- colnames(mixingMeansParamX)
+    nParam <- length(paramModel)
 
-        par(mfrow = c(nParam, 2), mar = rep(2, 4))
-        for(i in 1:ncol(mixingMeansParamX)) {
-          coda::traceplot(mixingMeansParamX[,i], col = "blue", main = paste('Trace of ', paramModel[i]))
-          coda::densplot(mixingMeansParamX[,i], col = "orange", main = paste('Density of ', paramModel[i]))
-        }
+    par(mfrow = c(nParam, 2), mar = rep(2, 4))
+    for(i in 1:ncol(mixingMeansParamX)) {
+      coda::traceplot(mixingMeansParamX[,i], col = "blue", main = paste('Trace of ', paramModel[i]))
+      coda::densplot(mixingMeansParamX[,i], col = "orange", main = paste('Density of ', paramModel[i]))
+    }
 ```
 
-```{r, posterior summaries}
+<br/>
+
+```{r, posterior summaries, eval = TRUE}
 # ================================
 # 4. Producing posterior summaries
 # ================================
-    # Average
-        average <- apply(model$results$estimation$paramX, 1:2, mean)
-    # 95% confidence intervals
-        CI.025 <- apply(model$results$estimation$paramX, 1:2, quantile, probs = 0.025)
-        CI.975 <- apply(model$results$estimation$paramX, 1:2, quantile, probs = 0.975)
+# Average
+    average <- apply(model$results$estimation$paramX, 1:2, mean)
+# 95% confidence intervals
+    CI.025 <- apply(model$results$estimation$paramX, 1:2, quantile, probs = 0.025)
+    CI.975 <- apply(model$results$estimation$paramX, 1:2, quantile, probs = 0.975)
 
-    # Summary table
-        paramXCITable <- cbind(unlist(as.data.frame(average)),
-                             unlist(as.data.frame(CI.025)),
-                             unlist(as.data.frame(CI.975)))
-        colnames(paramXCITable) <- c("average", "lowerCI", "upperCI")
-        rownames(paramXCITable) <- paste(rep(colnames(average), each = nrow(average)), "_", rep(rownames(average), ncol(average)), sep="")
+# Summary table
+    paramXCITable <- cbind(unlist(as.data.frame(average)),
+                         unlist(as.data.frame(CI.025)),
+                         unlist(as.data.frame(CI.975)))
+    colnames(paramXCITable) <- c("average", "lowerCI", "upperCI")
+    rownames(paramXCITable) <- paste(rep(colnames(average), each = nrow(average)), "_", rep(rownames(average), ncol(average)), sep="")
 
-    # Credible intervals
-        paramXCITable_Full <- paramXCITable
+# Credible intervals
+    paramXCITable_Full <- paramXCITable
 
-        beg <- seq(1,nrow(paramXCITable_Full), by = nsp)
-        end <- seq(nsp,nrow(paramXCITable_Full), by = nsp)
-        sign <- abs(as.numeric(paramXCITable_Full[, 'lowerCI'] <= 0 & paramXCITable_Full[, 'upperCI'] >=0) - 3)
+    beg <- seq(1,nrow(paramXCITable_Full), by = nsp)
+    end <- seq(nsp,nrow(paramXCITable_Full), by = nsp)
+    sign <- abs(as.numeric(paramXCITable_Full[, 'lowerCI'] <= 0 & paramXCITable_Full[, 'upperCI'] >=0) - 3)
 
-    # Export figure
-        par(mfrow = c((length(beg)+1),1))
-        for(i in 1:length(beg)) {
-            paramXCITable <- paramXCITable_Full[beg[i]:end[i], ]
-            cols <- sign[beg[i]:end[i]]
-            par(mar=c(1,2,1,1))
-            plot(0, 0, xlim = c(1, nrow(paramXCITable)), ylim = round(range(paramXCITable)), type = "n", xlab = "", ylab = "", main=paste(colnames(mixingMeansParamX)[i]), xaxt="n", bty = 'n')
-            axis(1,1:nsp,las=2, labels = rep('',nsp))
-            abline(h = 0,col = 'grey')
-            arrows(x0 = 1:nrow(paramXCITable), x1 = 1:nrow(paramXCITable), y0 = paramXCITable[, 2], y1 = paramXCITable[, 3], code = 3, angle = 90, length = 0.05, col = cols)
-            points(1:nrow(paramXCITable), paramXCITable[,1], pch = 15, cex = 1, col = cols)
-        }
-        mtext(text = spAll, side = 1, line = 1, outer = FALSE, at = 1:nsp, col = 1, las = 2, cex = 0.4)
+# Export figure
+    par(mfrow = c((length(beg)+1),1))
+    for(i in 1:length(beg)) {
+        paramXCITable <- paramXCITable_Full[beg[i]:end[i], ]
+        cols <- sign[beg[i]:end[i]]
+        par(mar=c(1,2,1,1))
+        plot(0, 0, xlim = c(1, nrow(paramXCITable)), ylim = round(range(paramXCITable)), type = "n", xlab = "", ylab = "", main=paste(colnames(mixingMeansParamX)[i]), xaxt="n", bty = 'n')
+        axis(1,1:nsp,las=2, labels = rep('',nsp))
+        abline(h = 0,col = 'grey')
+        arrows(x0 = 1:nrow(paramXCITable), x1 = 1:nrow(paramXCITable), y0 = paramXCITable[, 2], y1 = paramXCITable[, 3], code = 3, angle = 90, length = 0.05, col = cols)
+        points(1:nrow(paramXCITable), paramXCITable[,1], pch = 15, cex = 1, col = cols)
+    }
+    mtext(text = spAll, side = 1, line = 1, outer = FALSE, at = 1:nsp, col = 1, las = 2, cex = 0.4)
 ```
 
-```{r, association networks}
+<br/>
+
+```{r, association networks, eval = FALSE}
 # =======================
 # 6. Association networks
 # =======================
-    # Extract all estimated associatin matrix
-        assoMat <- HMSC::corRandomEff(model)
+# Extract all estimated associatin matrix
+    assoMat <- HMSC::corRandomEff(model)
 
-    # Average
-        plotMean <- apply(assoMat[, , , 1], 1:2, mean)
-        colnames(plotMean) <- rownames(plotMean) <- spAll
+# Average
+    plotMean <- apply(assoMat[, , , 1], 1:2, mean)
+    colnames(plotMean) <- rownames(plotMean) <- spAll
 
-    # Build matrix of colours for chordDiagram
-        plotDrawCol <- matrix(NA, nrow = nrow(plotMean), ncol = ncol(plotMean))
-        plotDrawCol[which(plotMean > 0.4, arr.ind=TRUE)]<-"red"
-        plotDrawCol[which(plotMean < -0.4, arr.ind=TRUE)]<-"blue"
-    # Build matrix of "significance" for corrplot
-        plotDraw <- plotDrawCol
-        plotDraw[which(!is.na(plotDraw), arr.ind = TRUE)] <- 0
-        plotDraw[which(is.na(plotDraw), arr.ind = TRUE)] <- 1
-        plotDraw <- matrix(as.numeric(plotDraw), nrow = nrow(plotMean), ncol = ncol(plotMean))
+# Build matrix of colours for chordDiagram
+    plotDrawCol <- matrix(NA, nrow = nrow(plotMean), ncol = ncol(plotMean))
+    plotDrawCol[which(plotMean > 0.4, arr.ind=TRUE)]<-"red"
+    plotDrawCol[which(plotMean < -0.4, arr.ind=TRUE)]<-"blue"
+# Build matrix of "significance" for corrplot
+    plotDraw <- plotDrawCol
+    plotDraw[which(!is.na(plotDraw), arr.ind = TRUE)] <- 0
+    plotDraw[which(is.na(plotDraw), arr.ind = TRUE)] <- 1
+    plotDraw <- matrix(as.numeric(plotDraw), nrow = nrow(plotMean), ncol = ncol(plotMean))
 
-    # plots
-        # Matrix plot
-        Colour <- colorRampPalette(c("red", "white", "blue"))(200)
-        corrplot::corrplot(plotMean, method = "color", col = Colour, type = "lower", diag = FALSE, p.mat = plotDraw, tl.srt = 65, tl.cex = 0.4, pch.cex = 0.3, tl.col = 'black')
+# plots
+    jpeg('./Pictures/correlationPlot.jpeg', width = 7, height = 7, res = 150, units = 'in')
+    # Matrix plot
+    Colour <- colorRampPalette(c("red", "white", "blue"))(200)
+    corrplot::corrplot(plotMean, method = "color", col = Colour, type = "lower", diag = FALSE, p.mat = plotDraw, tl.srt = 65, tl.cex = 0.4, pch.cex = 0.3, tl.col = 'black')
 
-        # Chord diagram
-        circlize::chordDiagram(plotMean, symmetric = TRUE, annotationTrack = 'grid', grid.col = "grey", col = plotDrawCol, preAllocateTracks = 1)
-        circlize::circos.trackPlotRegion(track.index = 1, panel.fun = function(x, y) {
-          xlim = circlize::get.cell.meta.data("xlim")
-          ylim = circlize::get.cell.meta.data("ylim")
-          sector.name = circlize::get.cell.meta.data("sector.index")
-          circlize::circos.text(mean(xlim), ylim[1] + .1, sector.name, facing = "clockwise", niceFacing = TRUE, adj = c(0, 0.5), cex = 0.4)
-        }, bg.border = NA)
-
+    # Chord diagram
+    circlize::chordDiagram(plotMean, symmetric = TRUE, annotationTrack = 'grid', grid.col = "grey", col = plotDrawCol, preAllocateTracks = 1)
+    circlize::circos.trackPlotRegion(track.index = 1, panel.fun = function(x, y) {
+      xlim = circlize::get.cell.meta.data("xlim")
+      ylim = circlize::get.cell.meta.data("ylim")
+      sector.name = circlize::get.cell.meta.data("sector.index")
+      circlize::circos.text(mean(xlim), ylim[1] + .1, sector.name, facing = "clockwise", niceFacing = TRUE, adj = c(0, 0.5), cex = 0.4)
+    }, bg.border = NA)
+    dev.off()
 ```
+
+[](https://github.com/remi-daigle/2017-CHONe-Data/tree/gh-pages/pictures/correlationPlot.jpeg)
+
+<br/>
 
 ```{r, predictive power}
     # ===============================================
@@ -809,13 +820,19 @@ model <- readRDS('./HMSCmodel.rds')
             abline(h = mean(R2, na.rm = T), col = "blue", lwd = 2)
 ```
 
-```{r, AUC}
+<br/>
+
+```{r, AUC, eval = FALSE}
     # =============================================
     # 8. Generating predictions for validation data
     # =============================================
         source('./crossValid.r')
         modelAUC <- crossValidation(data = HMSCdata,  nCV = 2, validPct = 0.2, as.strata = FALSE)
+        saveRDS(modelAUC, './modelAUC.rds')
+```
 
+```{r, AUC2}
+        modelAUC <- readRDS('./modelAUC.rds')
         meanAUC <- colMeans(modelAUC)
         sdAUC <- apply(modelAUC, MARGIN = 2, FUN = sd)
 
@@ -824,6 +841,8 @@ model <- readRDS('./HMSCmodel.rds')
         arrows(x0 = prevSp, x1 = prevSp, y0 = (meanAUC - sdAUC), y1 = (meanAUC + sdAUC), code = 3, angle = 90, length = 0.05)
         points(prevSp, meanAUC, pch = 19, cex = 0.8)
 ```
+
+<br/>
 
 ```{r, predictions}
 # Generate predictions
@@ -847,25 +866,33 @@ model <- readRDS('./HMSCmodel.rds')
     # colnames(HMSCpred) <- spAll
 ```
 
+<br/>
 
 ```{r, plotPred, eval = TRUE, message = FALSE}
-    # Plot grid
-        egsl_grid <- rgdal::readOGR(dsn = "./", layer = "egsl_grid")
-        proj <- "+proj=longlat +datum=WGS84"
-        egsl_grid <- sp::spTransform(egsl_grid, CRSobj = CRS(proj))
+# Plot grid
+    egsl_grid <- rgdal::readOGR(dsn = "./", layer = "egsl_grid")
+    proj <- "+proj=longlat +datum=WGS84"
+    egsl_grid <- sp::spTransform(egsl_grid, CRSobj = CRS(proj))
 
 
-        egsl_grid@data <- merge(egsl_grid@data, HMSCpred, by = 'ID')
+    egsl_grid@data <- merge(egsl_grid@data, HMSCpred, by = 'ID')
 
-        data <- egsl_grid@data[,31]
-        rbPal <- colorRampPalette(c('#2f6eb9','#2aadba','#b45f5f')) # color palette
-        cols <- rbPal(50)[as.numeric(cut(as.numeric(data), breaks = 50))]
-        plot(egsl_grid, col = cols, border = cols)
-
+    data <- egsl_grid@data[,31]
+    rbPal <- colorRampPalette(c('#2f6eb9','#2aadba','#b45f5f')) # color palette
+    cols <- rbPal(50)[as.numeric(cut(as.numeric(data), breaks = 50))]
+    plot(egsl_grid, col = cols, border = cols)
 ```
 
+<br/>
 
-[leaflet example](https://letir.github.io/Elections_fr-042017/)
+## Conclusions and some other cool stuff
+
+So this concludes the Shock & Awe portion of the workshop. We hope that seeing this has made you curious as to what else can be done in R and how it could help you in your work. Keep in mind, this is simply a short overview of some of the things that are possible in R. Here are a few more examples:
+
+- You can create your own website in R: [letiR website](https://letir.github.io/letiR_website)
+- You can create applications to dynamically visualize data with [`shiny`](https://shiny.rstudio.com/gallery/)
+- You can automate the creation of reports using `rmarkdown`, here is an [example](https://github.com/david-beauchesne/EGSL_species_distribution/blob/master/Script/4_northPluri_spDist.pdf) (more on this later)
+- **You can perform Marxan analyses using the [`marxan`](https://github.com/jeffreyhanson/marxan) package**
 
 
 [<<BACK](https://remi-daigle.github.io/2017-CHONe-Data/)
