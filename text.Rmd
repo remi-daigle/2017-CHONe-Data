@@ -427,65 +427,15 @@ Another neat visual tool available in R is the ability to produce custom wordle 
             wordcloud2::wordcloud2(paulWordDF, size = 1, color="random-light", backgroundColor=1)
 
 
-        # Word shaped wordle
-            wordcloud2::letterCloud(paulWordDF, word = "Paul")
-
-        # Image shaped wordle
-            wordcloud2::wordcloud2(paulWordDF, figPath = "./CoML_icon.png", size = 1.5)
-
-            wordcloud2::wordcloud2(paulWordDF, figPath = "./CHONe.jpg", size = 1.5)
+        # # Word shaped wordle
+        #     wordcloud2::letterCloud(paulWordDF, word = "Paul")
+        #
+        # # Image shaped wordle
+        #     wordcloud2::wordcloud2(paulWordDF, figPath = "./CoML_icon.png", size = 1.5)
+        #
+        #     wordcloud2::wordcloud2(paulWordDF, figPath = "./CHONe.jpg", size = 1.5)
 ```
 
 
 
 [<<BACK](https://remi-daigle.github.io/2017-CHONe-Data/)
-
-<!-- install.packages('webshot')
-install.packages('htmlwidgets')2
-
-
-library(wordcloud2)
-library(webshot)
-library(htmlwidgets)
-
-setwd('~/Desktop')
-
-dat <- readLines('words2wordle.txt')
-dat <- strsplit(dat, ':')
-word <- unlist(lapply(dat, function(x) x[1]))
-freq <- unlist(lapply(dat, function(x) x[2]))
-dat <- data.frame(word, freq)
-dat$word <- as.character(dat$word)
-dat$freq <- as.numeric(as.character(dat$freq))
-dat <- dat[order(dat$freq), ]
-
-wordcloud2(dat, figPath = "~/Desktop/sparrow.png", size = 1.5)
-
-# Make the graph
-my_graph <- wordcloud2(dat, figPath = "sparrow.png", size = 1.5)
-
-# save it in html
-saveWidget(my_graph,"tmp.html",selfcontained = F)
-
-# and in png
-webshot("tmp.html", "fig_1.pdf", delay =5, width = 480, vheight=480)
-
-
-
-
-
-
-
-
-
-wordcloud2::letterCloud(paulWordDF, word = 'Paul Snelgrove',size = 2, color="white", backgroundColor=1)
-
-wordcloud::wordcloud2(bookWords, color = "random-light", backgroundColor = "grey")
-
-letterCloud(matrix(ncol=2, data = seq(1:100)), word = 'R')
-wordcloud2(matrix(ncol=2, data = seq(1:100)), figPath = './CoML_icon.png')
-wordcloud2(bookWords, shape = 'star')
-
-wordcloud2(bookWords, figPath = './CoML_icon.png', size = 2, color = 'white', backgroundColor = 1)
-#
-# wordcloud2(as.matrix(bookWords[, c('word','n')]), figPath = './CoML.jpg') -->
