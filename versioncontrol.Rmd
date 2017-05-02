@@ -9,6 +9,7 @@ output:
     toc_float: yes
 ---
 [<<BACK](https://remi-daigle.github.io/2017-CHONe-Data/)
+
 # Data repositories
 
 Please Download:
@@ -129,7 +130,7 @@ That's all there is to it!
 
 # Putting it all together
 
-I want you to build something like [this](https://github.com/remi-daigle/CHONE-demo/)
+I want you to build something like [this](https://remi-daigle.github.io/CHONE-demo/index.nb.html)
 
 Once you have knitted your html file, go to your repository settings on GitHub.
 
