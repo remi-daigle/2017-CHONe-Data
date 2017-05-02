@@ -59,17 +59,98 @@ A version control system is a tool that keeps track of these changes for us and 
 
 ## How to use version control
 
-By default git 'watches' not just a single file; rather, it looks for changes in any file in an entire directory (except those identified in the .gitignore). So I tend to set it up in a way that makes git watch the whole project directory (i.e. the folder that contains the .Rproj file)
+By default git 'watches' not just a single file; rather, it looks for changes in any file in an entire directory (except those identified in the `.gitignore`). So I tend to set it up in a way that makes git watch the whole project directory (i.e. the folder that contains the .Rproj file). This 'watched' folder is then called a git repository (repo for short).
 
-While we can create a new 
+We can create a new repository any number of ways (git command line, GitHub Desktop App, RStudio, etc), but I'm going to show you my favorite workflow to create a whole new repository from scratch:
 
+1. Make a new repo on GitHub (the website)
+2. Clone that repo to your computer
+3. Create an .Rproj in RStudio
+4. Sync (pull), Edit files, commit, sync (push), repeat!
 
+### Make a new repo on GitHub (the website)
 
-https://xkcd.com/1296/
+Open up GitHub (and login), then click the 'New repository' button
 
-Remi/David: version control, student builder pack, Github)
+![](pictures/newrepository.png)
+
+Then set the repo name, a description of the project (optional), choose whether to make the repo public or private (see more in ), check the README box (the readme is a great place to describe the project even more, add metadata, etc). I'll explain the `.gitignore` option below. Finally, I usually choose the `MIT` license which according to GitHub: "The MIT License is a permissive license that is short and to the point. It lets people do anything they want with your code as long as they provide attribution back to you and don’t hold you liable." (This is similar to the CC-BY licence we recommend for data)
+
+![](pictures/newrepo.png)
+
+The `.gitignore` is a plain text file (that you can edit as you please) that tells which files, or types of files to ignore when 'watching' your folder. Since I work predominantly in R, I choose to use the `.gitignore` for R which handily ignores things that you would normally want git to ignore while working in R.
+
+![](pictures/gitignore.png)
+
+Congrats! You have created a repository!
+
+### Clone that repo to your computer
+
+Clone your repository to your computer so you can easily work on your files. That is hopefully a two click deal if you have already configured the GitHub Desktop App (login, etc), click on `Clone or Download`, then `Open in Desktop`, and finally choose where to put that repo.
+
+![](pictures/clone.png)
+
+### Create an .Rproj in RStudio
+
+Now you have a 'project folder' but RStudio doesn't know about it! First, open RStudio and start a new project.
+
+![](pictures/newRproj.png)
+
+Choose `Existing Directory` since you already have a project folder.
+
+![](pictures/existing.png)
+
+Browse to where you put your repo earlier and click `Create Project`.
+
+![](pictures/browse.png)
+
+You now have a fully functional portable project folder that is easy to move and/or use for collaboration and/or is a good start towards creating a reproducible project.
+
+Remember what I said when I talked about [Readin in data](https://remi-daigle.github.io/2017-CHONe-Data/cleaning.html#reading_in_data), when reading/writing files, always code relative to where the the `.Rproj` file is (i.e. the root of your project folder). 
+
+### Sync (pull), Edit files, commit, sync (push), repeat!
+
+Let's do a quick tour of the GitHub Desktop App before we start using it. The app has 2 maine tabs that you can toggle at the top, `Changes`, and `History`. Additionally, regardless of which tab you're on there's the repo menu on the left that shows you which repos the app knows about (don't be surprised if you have less than me!) as well as the dark grey visual history of the repository.
+
+![](pictures/history.png)
+
+Either way you look at it the history is very short! There is only the one commit called `Initial commit` where I added 3 files (the green +'s). A commit is essentially a saved version of your entire project repository. If you click on the little arrow next to each file, you can see what changes where made (green +'s for additions and red -'s for deletions). In this case I created the new files, so all the lines show up as additions.
+
+![](pictures/changes.png)
+
+The `Changes` tab shows you what changes you have made since your last commit. Let's commit the changes we made by creating the `.Rproj` file. Fill in the `Summary` box  with **something descriptive** of the changes you just made.
+
+![via XKCD (https://xkcd.com/1296/)](https://imgs.xkcd.com/comics/git_commit.png)
+
+That's all there is to it!
+
+> **Pro-tip**
+> Now the order of operations "Sync (pull), Edit files, commit, sync (push), repeat" is really important. Before you start working, you want to make sure you are working on the latest version of your repo (less relevant if you are the only one working on your repo on only one computer, but still a good habit), so you are going to want to pull down (or sync) the latest changes from GitHub (the website) before you start working. You also will want to commit those changes before pulling down (or syncing) again since un-commited changes can be lost if they are overwritten by a changed file on Github. Finally, don't forget to push (sync) your changes to GitHub so that your collaborators can see/use them.
 
 # Putting it all together
-rmd and github pages
+
+I want you to build something like [this](https://github.com/remi-daigle/CHONE-demo/)
+
+Once you have knitted your html file, go to your repository settings on GitHub.
+
+![](pictures/settings.png)
+
+And set your master branch as the source.
+
+![](pictures/pages.png)
+
+# Become a GitHub power user!
+
+[Branches](https://guides.github.com/introduction/flow/) and [Forks](https://guides.github.com/activities/forking/) are treated very differently most, but I see them as almost identical. The only real difference
+
+Using the [Issues](https://guides.github.com/features/issues/) tab on GitHub as your 'to-do' list
+
+Archiving your code with [Zenodo](https://guides.github.com/activities/citable-code/)
+
+# Student developer pack and Educational discount
+
+GitHub has put together a suite of free tools for students called the [Student developer pack](https://education.github.com/pack), the most important of which is the option to have unlimited free private repositories on GitHub!
+
+Even as a non-student, you can ask for an [educational discount](https://education.github.com/discount_requests/new) if you involved in education/research which usually grants those same free private repos!
 
 [<<BACK](https://remi-daigle.github.io/2017-CHONe-Data/)
