@@ -802,6 +802,8 @@ model <- readRDS('./HMSCmodel.rds')
     dev.off()
 ```
 
+<br/>
+
 [](https://github.com/remi-daigle/2017-CHONe-Data/tree/gh-pages/pictures/correlationPlot.jpeg)
 
 <br/>
